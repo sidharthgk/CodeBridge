@@ -9,9 +9,9 @@ import Auth from './pages/Auth';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#1A1A1A] text-white">
+      <div className="min-h-screen bg-gradient-to-b from-[#121212] to-[#1A1A1A] text-white">
         <Navbar />
-        <main className="container mx-auto">
+        <main className="container mx-auto px-6 sm:px-12 py-10">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
