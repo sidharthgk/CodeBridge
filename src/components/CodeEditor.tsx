@@ -4,14 +4,11 @@ import Editor from "@monaco-editor/react";
 interface CodeEditorProps {
   language: string;
   theme?: "vs-dark" | "light";
+  onRunCode?: (code: string) => void;
 }
 
-const CodeEditor: React.FC<CodeEditorProps> = ({ language, theme = "vs-dark" }) => {
+const CodeEditor: React.FC<CodeEditorProps> = ({ language, theme = "vs-dark", onRunCode }) => {
   const [code, setCode] = useState("");
-
-  const handleCodeChange = (newValue: string | undefined) => {
-    setCode(newValue || "");
-  };
 
   return (
     <div className="bg-[#1A1A1A] border border-[#FFD700] rounded-lg shadow-lg p-4">
@@ -23,14 +20,18 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ language, theme = "vs-dark" }) 
         defaultValue="// Start coding..."
         theme={theme}
         value={code}
-        onChange={handleCodeChange}
-        options={{
-          fontSize: 14,
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-        }}
+        onChange={(newValue) => setCode(newValue || "")}
+        options={{ fontSize: 14, minimap: { enabled: false }, scrollBeyondLastLine: false, automaticLayout: true }}
       />
+
+      {onRunCode && (
+        <button
+          className="mt-4 px-6 py-2 bg-gradient-to-r from-[#FFD700] to-[#FFDF50] text-black rounded-lg font-semibold hover:scale-105"
+          onClick={() => onRunCode(code)}
+        >
+          Run Code
+        </button>
+      )}
     </div>
   );
 };

@@ -7,4 +7,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  define: {
+    "process.env": process.env, // Ensures `process.env` is available in Vite
+  },
 });

@@ -1,10 +1,13 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Learn from './pages/Learn';
-import Projects from './pages/Projects';
-import Auth from './pages/Auth';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Learn from "./pages/Learn";
+import Projects from "./pages/Projects";
+import Auth from "./pages/Auth";
+import ModeSelection from "./pages/ModeSelection";
+import ScratchMode from "./pages/ScratchMode";
+import ComparisonMode from "./pages/ComparisonMode";
 
 function App() {
   return (
@@ -18,6 +21,9 @@ function App() {
             <Route path="/learn" element={<Learn />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/mode-selection" element={<ModeSelection />} />
+            <Route path="/scratch-mode" element={<ScratchMode />} />
+            <Route path="/comparison-mode" element={<ComparisonMode />} />
           </Routes>
         </main>
       </div>
