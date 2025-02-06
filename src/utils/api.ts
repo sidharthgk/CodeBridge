@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Load API key securely
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '');
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY ||  process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent";
 
 export const runCode = async (language: string, code: string) => {
