@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Load API key securely
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY ||  process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent";
 
 export const runCode = async (language: string, code: string) => {
@@ -11,17 +11,17 @@ export const runCode = async (language: string, code: string) => {
       {
         contents: [
           {
-            role: "user",
-            parts: [
-              {
-                text: `Execute this ${language} code and return the output:\n\n${code}`,
-              },
-            ],
+        role: "user",
+        parts: [
+          {
+          text: `Execute the following ${language} code and provide the terminal output:\n\n${code}\n\nIf there is an error, display the error message.`,
           },
         ],
+        },
+      ],
       },
       {
-        headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       }
     );
 
