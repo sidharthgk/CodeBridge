@@ -1,50 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Base Styles */
-body {
-  @apply bg-primary text-white font-sans;
+@layer base {
+  body {
+    @apply bg-black text-white font-inter antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-montserrat uppercase tracking-wider;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-black/30;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-amber-500/50 rounded-full hover:bg-amber-500/70 transition-colors;
+  }
 }
 
-html, body, #root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+@layer components {
+  .glass-panel {
+    @apply bg-black/30 backdrop-blur-lg border border-white/10 rounded-2xl
+           shadow-[0_8px_32px_rgba(0,0,0,0.37)]
+           hover:shadow-amber-500/10 hover:border-amber-500/20
+           transition-all duration-500;
+  }
+  
+  .gold-gradient {
+    @apply bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500
+           bg-size-200 animate-gradient-x;
+  }
+
+  .gold-text {
+    @apply bg-clip-text text-transparent gold-gradient;
+  }
+
+  .btn-primary {
+    @apply px-8 py-3 rounded-full relative overflow-hidden
+           transform transition-all duration-300
+           hover:scale-105 active:scale-95
+           before:absolute before:inset-0
+           before:bg-gradient-to-r before:from-amber-500 before:via-yellow-500 before:to-amber-500
+           before:bg-size-200 before:animate-gradient-x before:transition-all
+           before:duration-500 before:-z-10
+           after:absolute after:inset-[2px]
+           after:bg-black/80 after:rounded-full after:-z-10
+           text-amber-500 hover:text-white
+           shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40
+           focus:outline-none focus:ring-2 focus:ring-amber-500/50
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-3 rounded-full
+           bg-black/50 backdrop-blur-sm
+           border border-amber-500/30
+           transform transition-all duration-300
+           hover:border-amber-500 hover:bg-amber-500/10
+           hover:scale-105 active:scale-95
+           shadow-lg shadow-black/50 hover:shadow-amber-500/20
+           focus:outline-none focus:ring-2 focus:ring-amber-500/50
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg
+           bg-black/50 border border-white/10
+           focus:border-amber-500 focus:ring-1 focus:ring-amber-500
+           transition-all duration-300
+           placeholder:text-gray-500
+           shadow-inner shadow-black/50
+           disabled:opacity-50 disabled:cursor-not-allowed
+           invalid:border-red-500/50 invalid:focus:border-red-500;
+  }
+
+  /* Card Hover Effects */
+  .hover-card {
+    @apply relative overflow-hidden
+           before:absolute before:inset-0
+           before:bg-gradient-to-r before:from-amber-500/0 before:via-amber-500/10 before:to-amber-500/0
+           before:translate-x-[-200%] hover:before:translate-x-[200%]
+           before:transition-transform before:duration-1000
+           hover:border-amber-500/30 hover:shadow-amber-500/20;
+  }
+
+  /* Animated Background */
+  .animated-bg {
+    @apply absolute inset-0 -z-10
+           bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]
+           from-amber-900/20 via-black to-black
+           animate-pulse-slow;
+  }
+
+  /* Glowing Text */
+  .glow-text {
+    @apply relative
+           after:absolute after:inset-0
+           after:bg-amber-500/20 after:blur-xl
+           after:scale-150 after:-z-10;
+  }
+
+  /* Animated Border */
+  .animated-border {
+    @apply relative
+           before:absolute before:inset-0
+           before:p-[2px] before:rounded-2xl
+           before:bg-gradient-to-r before:from-amber-500 before:to-yellow-500
+           before:animate-border-glow;
+  }
+
+  /* Loading Spinner */
+  .loading-spinner {
+    @apply animate-spin rounded-full border-4 border-amber-500/20 border-t-amber-500
+           w-8 h-8 mx-auto;
+  }
+
+  /* Progress Bar */
+  .progress-bar {
+    @apply h-2 bg-black/30 rounded-full overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full bg-gradient-to-r from-amber-500 to-yellow-500
+           transition-all duration-500 ease-out;
+  }
+
+  /* Toast Notification */
+  .toast {
+    @apply fixed bottom-4 right-4 px-6 py-3
+           glass-panel border-amber-500/30
+           transform transition-all duration-300
+           translate-y-0 opacity-100
+           data-[state=closed]:translate-y-4 data-[state=closed]:opacity-0;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    @apply absolute px-2 py-1 text-sm
+           glass-panel border-amber-500/30
+           transform transition-all duration-200
+           scale-0 group-hover:scale-100
+           z-50;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-amber-500/10 text-amber-500
+           border border-amber-500/30;
+  }
+
+  /* Tab */
+  .tab {
+    @apply px-4 py-2 rounded-lg
+           transition-all duration-200
+           hover:bg-amber-500/10
+           data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-500;
+  }
 }
 
-/* Anchor tags */
-a {
-  @apply text-accent hover:underline;
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
-/* Smooth Transitions */
-.transition-all {
-  transition: all 0.4s ease;
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
-/* Glassmorphism Effect for Cards/Containers */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+@keyframes border-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
-::-webkit-scrollbar-track {
-  background: #1A1A1A;
-}
-::-webkit-scrollbar-thumb {
-  background: #404040;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #D4AF37;
+
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
 }

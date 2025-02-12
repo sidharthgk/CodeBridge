@@ -1,34 +1,37 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
-import Learn from "./pages/Learn";
-import Projects from "./pages/Projects";
-import Auth from "./pages/Auth";
-import ModeSelection from "./pages/ModeSelection";
-import ScratchMode from "./pages/ScratchMode";
-import ComparisonMode from "./pages/ComparisonMode";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import Navbar from './components/Navbar';
+import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ModeSelection from './pages/ModeSelection';
+import Dashboard from './pages/Dashboard';
+import CodeConverter from './pages/CodeConverter';
+import ProjectLearning from './pages/ProjectLearning';
+import ScratchMode from './pages/ScratchMode';
+import ComparisonMode from './pages/ComparisonMode';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-b from-[#121212] to-[#1A1A1A] text-white">
+      <div className="min-h-screen bg-black">
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black -z-10" />
         <Navbar />
-        <main className="container mx-auto px-6 sm:px-12 py-10">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/mode-selection" element={<ModeSelection />} />
-            <Route path="/scratch-mode" element={<ScratchMode />} />
-            <Route path="/comparison-mode" element={<ComparisonMode />} />
-          </Routes>
-        </main>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/mode-selection" element={<ModeSelection />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/code-converter" element={<CodeConverter />} />
+          <Route path="/projects" element={<ProjectLearning />} />
+          <Route path="/scratch-mode" element={<ScratchMode />} />
+          <Route path="/comparison-mode" element={<ComparisonMode />} />
+        </Routes>
       </div>
     </Router>
   );
 }
 
-export default App;
+export default App
