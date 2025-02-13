@@ -8,12 +8,11 @@ interface LoadingLogoProps {
 
 const LoadingLogo: React.FC<LoadingLogoProps> = ({ size = 'md', className = '' }) => {
   const sizes = {
-    sm: 'text-xl',
-    md: 'text-2xl',
-    lg: 'text-4xl',
-    xl: 'text-6xl'
-  };
-
+    sm: 'text-2xl',  // Was text-xl → Increased
+    md: 'text-4xl',  // Was text-2xl → Increased
+    lg: 'text-6xl',  // Was text-4xl → Increased
+    xl: 'text-8xl'   // Was text-6xl → Increased
+  };  
   const containerVariants = {
     animate: {
       transition: {
@@ -52,7 +51,7 @@ const LoadingLogo: React.FC<LoadingLogoProps> = ({ size = 'md', className = '' }
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative flex items-center justify-center h-full w-full ${className}`}>
       {/* Glow effect */}
       <motion.div
         variants={glowVariants}
@@ -61,21 +60,33 @@ const LoadingLogo: React.FC<LoadingLogoProps> = ({ size = 'md', className = '' }
         className="absolute inset-0 bg-amber-500/20 blur-xl rounded-full"
       />
       
+      {/* Animated Text */}
       <motion.div
         variants={containerVariants}
         initial="initial"
         animate="animate"
-        className={`font-bold ${sizes[size]} text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-500 flex items-center justify-center relative z-10`}
+        className={`font-bold ${sizes[size]} flex items-center justify-center relative z-10`}
       >
-        <motion.span variants={symbolVariants}>&lt;</motion.span>
-        <motion.span 
-          variants={symbolVariants}
-          className="mx-0.5"
-        >/</motion.span>
-        <motion.span variants={symbolVariants}>&gt;</motion.span>
+        <motion.span variants={symbolVariants}>
+          <span className="bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">
+            &lt;
+          </span>
+        </motion.span>
+        
+        <motion.span variants={symbolVariants} className="mx-0.5">
+          <span className="bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">
+            /
+          </span>
+        </motion.span>
+        
+        <motion.span variants={symbolVariants}>
+          <span className="bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">
+            &gt;
+          </span>
+        </motion.span>
       </motion.div>
     </div>
   );
-};
+}  
 
 export default LoadingLogo;
