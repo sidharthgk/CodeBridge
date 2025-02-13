@@ -1,10 +1,30 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
-import { Code2, Laptop, Brain, Trophy, BarChart3, GitCompare, Zap, Users, Globe } from 'lucide-react';
+import { 
+  Code2, 
+  Laptop, 
+  Brain, 
+  Trophy, 
+  BarChart3, 
+  GitCompare, 
+  Zap, 
+  Users, 
+  Globe 
+} from 'lucide-react';
 
-const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => {
+// -----------------------------
+// FeatureCard Component
+// -----------------------------
+const FeatureCard = ({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  description: string;
+}) => {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -15,7 +35,8 @@ const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: str
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      whileHover={{ scale: 1.02 }}
       className="glass-panel p-6 hover:border-amber-500/30 transition-all duration-300"
     >
       <Icon className="h-8 w-8 text-amber-500 mb-4" />
@@ -25,7 +46,20 @@ const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: str
   );
 };
 
-const TestimonialCard = ({ name, role, content, image }: { name: string, role: string, content: string, image: string }) => {
+// -----------------------------
+// TestimonialCard Component
+// -----------------------------
+const TestimonialCard = ({
+  name,
+  role,
+  content,
+  image,
+}: {
+  name: string;
+  role: string;
+  content: string;
+  image: string;
+}) => {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -36,11 +70,12 @@ const TestimonialCard = ({ name, role, content, image }: { name: string, role: s
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      whileHover={{ scale: 1.02 }}
       className="glass-panel p-6"
     >
       <div className="flex items-center space-x-4 mb-4">
-        <img src={image} alt={name} className="w-12 h-12 rounded-full" />
+        <img src={image} alt={name} className="w-12 h-12 rounded-full object-cover" />
         <div>
           <h4 className="font-bold">{name}</h4>
           <p className="text-sm text-gray-400">{role}</p>
@@ -51,35 +86,56 @@ const TestimonialCard = ({ name, role, content, image }: { name: string, role: s
   );
 };
 
-const StatisticCard = ({ value, label }: { value: string, label: string }) => (
+// -----------------------------
+// StatisticCard Component
+// -----------------------------
+const StatisticCard = ({ value, label }: { value: string; label: string }) => (
   <div className="text-center">
     <h3 className="text-4xl font-bold gold-text mb-2">{value}</h3>
     <p className="text-gray-400">{label}</p>
   </div>
 );
 
+// -----------------------------
+// LandingPage Component
+// -----------------------------
 const LandingPage = () => {
   const [heroRef, heroInView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
 
+  // Variants for staggering Feature Cards
+  const featuresContainerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
   return (
     <div className="min-h-screen">
+      {/* -------------------------------- */}
       {/* Hero Section */}
+      {/* -------------------------------- */}
       <motion.section
         ref={heroRef}
-        initial={{ opacity: 0 }}
-        animate={heroInView ? { opacity: 1 } : {}}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
         className="min-h-screen flex items-center justify-center relative overflow-hidden"
       >
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10" />
-        
+        <div
+          className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80')] 
+                      bg-cover bg-center opacity-20"
+        />
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, duration: 0.8, ease: 'easeOut' }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 gold-text">
               Master Any Programming Language
@@ -89,18 +145,32 @@ const LandingPage = () => {
               Your journey to becoming a polyglot developer starts here.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/signup" className="btn-primary">
-                Start Learning Now
-              </Link>
-              <Link to="#features" className="btn-secondary">
-                Explore Features
-              </Link>
+              {/* Primary Button */}
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to="/signup"
+                  className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-semibold shadow-md shadow-amber-500/20 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30"
+                >
+                  Start Learning Now
+                </Link>
+              </motion.div>
+              {/* Secondary Button */}
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to="#features"
+                  className="px-6 py-3 rounded-lg border border-amber-500/50 text-amber-500 font-semibold transition-all duration-300 hover:bg-amber-500/10"
+                >
+                  Explore Features
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </motion.section>
 
+      {/* -------------------------------- */}
       {/* Statistics Section */}
+      {/* -------------------------------- */}
       <section className="py-20 bg-black/50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -112,13 +182,20 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* -------------------------------- */}
       {/* Features Section */}
+      {/* -------------------------------- */}
       <section id="features" className="py-20 bg-black/50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16 gold-text">
             Why Choose CLLP?
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={featuresContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <FeatureCard
               icon={Code2}
               title="Side-by-Side Learning"
@@ -149,43 +226,53 @@ const LandingPage = () => {
               title="Code Conversion"
               description="Convert code between different programming languages with our intelligent translation system."
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
+      {/* -------------------------------- */}
       {/* How It Works Section */}
+      {/* -------------------------------- */}
       <section className="py-20 bg-black/30">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16 gold-text">
             How It Works
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="glass-panel p-8 text-center">
+            <div className="glass-panel p-8 text-center hover:scale-105 transition-transform duration-300">
               <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-6">
                 <Users className="h-8 w-8 text-amber-500" />
               </div>
               <h3 className="text-xl font-bold mb-4">1. Choose Your Path</h3>
-              <p className="text-gray-400">Select your learning mode and preferred programming languages.</p>
+              <p className="text-gray-400">
+                Select your learning mode and preferred programming languages.
+              </p>
             </div>
-            <div className="glass-panel p-8 text-center">
+            <div className="glass-panel p-8 text-center hover:scale-105 transition-transform duration-300">
               <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-6">
                 <Zap className="h-8 w-8 text-amber-500" />
               </div>
               <h3 className="text-xl font-bold mb-4">2. Learn Interactively</h3>
-              <p className="text-gray-400">Practice with real-time feedback and interactive exercises.</p>
+              <p className="text-gray-400">
+                Practice with real-time feedback and interactive exercises.
+              </p>
             </div>
-            <div className="glass-panel p-8 text-center">
+            <div className="glass-panel p-8 text-center hover:scale-105 transition-transform duration-300">
               <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-6">
                 <Globe className="h-8 w-8 text-amber-500" />
               </div>
               <h3 className="text-xl font-bold mb-4">3. Build Projects</h3>
-              <p className="text-gray-400">Apply your skills by building real-world applications.</p>
+              <p className="text-gray-400">
+                Apply your skills by building real-world applications.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* -------------------------------- */}
       {/* Testimonials Section */}
+      {/* -------------------------------- */}
       <section className="py-20 bg-black/50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16 gold-text">
@@ -214,7 +301,9 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* -------------------------------- */}
       {/* CTA Section */}
+      {/* -------------------------------- */}
       <section className="py-20 bg-black/30">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-8 gold-text">
@@ -223,9 +312,14 @@ const LandingPage = () => {
           <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
             Join thousands of developers who have accelerated their careers with CLLP.
           </p>
-          <Link to="/signup" className="btn-primary">
-            Get Started for Free
-          </Link>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link
+              to="/signup"
+              className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-semibold shadow-md shadow-amber-500/20 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30"
+            >
+              Get Started for Free
+            </Link>
+          </motion.div>
         </div>
       </section>
     </div>

@@ -18,7 +18,6 @@ const LoadingScreen: React.FC = () => {
           transition={{ delay: 0.5 }}
           className="text-amber-500/80 text-lg"
         >
-          Loading amazing things...
         </motion.div>
       </div>
     </motion.div>
