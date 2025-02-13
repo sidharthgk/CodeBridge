@@ -22,6 +22,7 @@ const Navbar = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+    
   }, []);
 
   const toggleDropdown = (title: string) => {
