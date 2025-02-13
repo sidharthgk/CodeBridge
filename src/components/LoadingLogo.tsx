@@ -52,7 +52,7 @@ const LoadingLogo: React.FC<LoadingLogoProps> = ({ size = 'md', className = '' }
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className} flex items-center justify-center h-full w-full`}>
       {/* Glow effect */}
       <motion.div
         variants={glowVariants}
