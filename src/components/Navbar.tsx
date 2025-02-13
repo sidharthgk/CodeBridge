@@ -15,6 +15,7 @@ const Navbar = () => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+    
   }, []);
 
   const isActive = (path: string) => location.pathname === path;
