@@ -131,7 +131,7 @@ const Navbar = () => {
             <div className="pl-4 flex items-center space-x-4">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <a
-                  href="/login"
+                  href="../login"
                   className="px-6 py-2 rounded-lg border border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all duration-300"
                 >
                   Login
