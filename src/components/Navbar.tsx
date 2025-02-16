@@ -64,7 +64,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transform-gpu transition-colors transition-shadow transition-padding duration-300 ease-in-out ${
+      className={`fixed w-full z-50 transform-gpu transition-shadow transition-padding duration-300 ease-in-out ${
         scrolled
           ? "py-3 bg-black/90 backdrop-blur-xl border-b border-amber-500/10 shadow-lg shadow-amber-500/5"
           : "py-5 bg-transparent border-b border-transparent"

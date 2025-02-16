@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import Playground from "../components/Playground";
+import Footer from "../components/Footer";
 import { 
   Code2, 
   Laptop, 
@@ -12,13 +13,6 @@ import {
   Zap, 
   Users, 
   Globe,
-  Github,
-  Twitter,
-  Linkedin,
-  Mail,
-  Heart,
-  Coffee,
-  Play,
   ArrowRight
 } from 'lucide-react';
 
@@ -68,78 +62,16 @@ const StatisticCard = ({ value, label }: { value: string; label: string }) => (
 // -----------------------------
 // Interactive Playground Component
 // -----------------------------
-const InteractivePlayground = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('python');
-  
-  const codeExamples = {
-    python: `def greet(name):
-    return f"Hello, {name}!"
-
-print(greet("World"))`,
-    javascript: `function greet(name) {
-    return \`Hello, \${name}!\`
-}
-
-console.log(greet("World"))`,
-    java: `public class Main {
-    public static String greet(String name) {
-        return "Hello, " + name + "!";
-    }
-
-    public static void main(String[] args) {
-        System.out.println(greet("World"));
-    }
-}`
-  };
-
-  return (
-    <div className="glass-panel p-6">
-      <div className="flex space-x-4 mb-4">
-        {Object.keys(codeExamples).map((lang) => (
-          <button
-            key={lang}
-            onClick={() => setSelectedLanguage(lang)}
-            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-              selectedLanguage === lang
-                ? 'bg-amber-500 text-black'
-                : 'bg-black/30 text-gray-400 hover:bg-black/50'
-            }`}
-          >
-            {lang.charAt(0).toUpperCase() + lang.slice(1)}
-          </button>
-        ))}
-      </div>
-      <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
-        <pre className="text-gray-300">
-          {codeExamples[selectedLanguage as keyof typeof codeExamples]}
-        </pre>
-      </div>
-      <div className="mt-4 flex justify-between items-center">
-        <p className="text-gray-400">Try editing the code in our full playground</p>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center space-x-2 px-4 py-2 bg-amber-500 text-black rounded-lg"
-        >
-          <Play className="h-4 w-4" />
-          <span>Run Code</span>
-        </motion.button>
-      </div>
+<section className="py-20 bg-black/50">
+  <div className="container mx-auto px-4">
+    <h2 className="text-4xl font-bold text-center mb-8 gold-text">
+      Try Our Interactive Playground
+    </h2>
+    <div className="max-w-4xl mx-auto">
+      <Playground />
     </div>
-  );
-};
-
-// -----------------------------
-// Footer Link Component
-// -----------------------------
-const FooterLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a 
-    href={href}
-    className="text-gray-400 hover:text-amber-500 transition-colors duration-300"
-  >
-    {children}
-  </a>
-);
+  </div>
+</section>
 
 // -----------------------------
 // Main LandingPage Component
@@ -311,7 +243,7 @@ const LandingPage = () => {
             Experience our side-by-side learning approach. Switch between languages and see how the same concept is expressed differently.
           </p>
           <div className="max-w-4xl mx-auto">
-            <InteractivePlayground />
+            <Playground />
           </div>
           <div className="text-center mt-8">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -348,79 +280,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/70 border-t border-gray-800">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div className="space-y-4">
-              <p className="text-xl font-bold gold-text">CodeBridge</p>
-              <p className="text-gray-400">
-                Bridging the gap between programming languages through interactive learning
-                and intuitive comparison tools.
-              </p>
-              <div className="flex space-x-4">
-                <FooterLink href="#"><Github className="h-5 w-5" /></FooterLink>
-                <FooterLink href="#"><Twitter className="h-5 w-5" /></FooterLink>
-                <FooterLink href="#"><Linkedin className="h-5 w-5" /></FooterLink>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><FooterLink href="#">About Us</FooterLink></li>
-                <li><FooterLink href="#">Features</FooterLink></li>
-                <li><FooterLink href="#">Pricing</FooterLink></li>
-                <li><FooterLink href="#">Blog</FooterLink></li>
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Resources</h4>
-              <ul className="space-y-2">
-                <li><FooterLink href="#">Documentation</FooterLink></li>
-                <li><FooterLink href="#">Tutorials</FooterLink></li>
-                <li><FooterLink href="#">Community</FooterLink></li>
-                <li><FooterLink href="#">API Reference</FooterLink></li>
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Stay Updated</h4>
-              <p className="text-gray-400">Get the latest updates and resources.</p>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="bg-black/50 border border-gray-700 rounded-l-lg px-4 py-2 focus:outline-none focus:border-amber-500 flex-grow"
-                />
-                <button className="bg-amber-500 text-black px-4 py-2 rounded-r-lg hover:bg-amber-600 transition-colors duration-300">
-                  <Mail className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Footer */}
-          <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} CodeBridge. All rights reserved.
-            </p>
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <FooterLink href="#">Privacy Policy</FooterLink>
-              <FooterLink href="#">Terms of Service</FooterLink>
-              <span className="text-gray-400">|</span>
-              <span className="text-gray-400 flex items-center">
-                Made with <Heart className="h-4 w-4 text-red-500 mx-1" /> and{" "}
-                <Coffee className="h-4 w-4 text-amber-500 mx-1" />
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import CodeConverter from "./pages/CodeConverter";
 import ProjectLearning from "./pages/ProjectLearning";
 import ScratchMode from "./pages/ScratchMode";
 import ComparisonMode from "./pages/ComparisonMode";
+import PlaygroundPage from "./pages/PlaygroundPage";
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function AppContent() {
             <Route path="/projects" element={<ProjectLearning />} />
             <Route path="/scratch-mode" element={<ScratchMode />} />
             <Route path="/comparison-mode" element={<ComparisonMode />} />
+            <Route path="/playground" element={<PlaygroundPage />} />
           </Routes>
         </AnimatePresence>
       </Suspense>

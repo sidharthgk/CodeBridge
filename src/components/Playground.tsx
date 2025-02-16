@@ -1,68 +1,106 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Play } from "lucide-react";
+import { Play, Settings, Copy, Save } from "lucide-react";
+import Editor from "@monaco-editor/react";
 
 const Playground = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [language, setLanguage] = useState("python");
+  const [code, setCode] = useState(`print("Hello, World!")`);
+  const [isRunning, setIsRunning] = useState(false);
 
-  const codeExamples = {
-    python: `def greet(name):
-    return f"Hello, {name}!"
+  const languageMap = {
+    python: 71,
+    javascript: 63,
+    java: 62,
+    cpp: 54,
+  };
 
-print(greet("World"))`,
-    javascript: `function greet(name) {
-    return \`Hello, \${name}!\`
-}
-
-console.log(greet("World"))`,
-    java: `public class Main {
-    public static String greet(String name) {
-        return "Hello, " + name + "!";
-    }
-
-    public static void main(String[] args) {
-        System.out.println(greet("World"));
-    }
-}`
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(code);
   };
 
   return (
-    <div className="glass-panel p-6">
-      {/* Language Selection Buttons */}
-      <div className="flex space-x-4 mb-4">
-        {Object.keys(codeExamples).map((lang) => (
-          <button
-            key={lang}
-            onClick={() => setSelectedLanguage(lang)}
-            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-              selectedLanguage === lang
-                ? "bg-amber-500 text-black"
-                : "bg-black/30 text-gray-400 hover:bg-black/50"
-            }`}
+    <div className="relative p-6 space-y-4">
+      <div className="flex items-center justify-between px-4">
+        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-yellow-500">
+          Interactive Playground
+        </h2>
+        <div className="flex items-center gap-3">
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="bg-transparent text-amber-500 py-1.5 px-3 rounded-md border border-amber-500/30 
+                     focus:ring-1 focus:ring-amber-500 focus:border-transparent outline-none 
+                     hover:border-amber-500/50 text-sm"
           >
-            {lang.charAt(0).toUpperCase() + lang.slice(1)}
+            {Object.keys(languageMap).map((lang) => (
+              <option key={lang} value={lang} className="bg-black">
+                {lang.charAt(0).toUpperCase() + lang.slice(1)}
+              </option>
+            ))}
+          </select>
+          <button className="p-1.5 hover:bg-amber-500/10 rounded-md transition-colors">
+            <Settings className="h-4 w-4 text-amber-500" />
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* Code Display Section */}
-      <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
-        <pre className="text-gray-300">
-          {codeExamples[selectedLanguage as keyof typeof codeExamples]}
-        </pre>
+      <div className="relative">
+        <div className="absolute right-3 top-3 z-10 flex gap-2 opacity-0 hover:opacity-100 transition-opacity">
+          <button
+            onClick={handleCopyCode}
+            className="p-1.5 bg-amber-500/10 hover:bg-amber-500/20 rounded-md text-amber-500 transition-colors"
+          >
+            <Copy className="h-4 w-4" />
+          </button>
+          <button className="p-1.5 bg-amber-500/10 hover:bg-amber-500/20 rounded-md text-amber-500 transition-colors">
+            <Save className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="overflow-hidden rounded-lg ring-1 ring-amber-500/20">
+          <Editor
+            height="450px"
+            language={language}
+            value={code}
+            onChange={(newValue) => setCode(newValue || "")}
+            theme="vs-dark"
+            options={{
+              fontSize: 14,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              folding: true,
+              lineNumbers: "on",
+              roundedSelection: false,
+              automaticLayout: true,
+              padding: { top: 16 },
+            }}
+            className="[&>div]:bg-black"
+          />
+        </div>
       </div>
 
-      {/* Run Button */}
-      <div className="mt-4 flex justify-between items-center">
-        <p className="text-gray-400">Try editing the code in our full playground</p>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center space-x-2 px-4 py-2 bg-amber-500 text-black rounded-lg"
+      <div className="flex justify-between items-center px-4">
+        <div className="text-sm text-amber-500/70">
+          {code.split("\n").length} lines | {language.toUpperCase()}
+        </div>
+        <button
+          onClick={() => {
+            setIsRunning(true);
+            setTimeout(() => setIsRunning(false), 1000);
+            console.log("Run code");
+          }}
+          disabled={isRunning}
+          className={`px-5 py-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-500 
+                     text-black font-medium shadow-lg shadow-amber-500/20 
+                     transition-all duration-200 hover:shadow-amber-500/30 
+                     hover:scale-102 active:scale-98 flex items-center gap-2
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     disabled:hover:scale-100 disabled:hover:shadow-none`}
         >
-          <Play className="h-4 w-4" />
-          <span>Run Code</span>
-        </motion.button>
+          <Play className={`h-4 w-4 ${isRunning ? "animate-spin" : ""}`} />
+          <span className="text-sm">
+            {isRunning ? "Running..." : "Run Code"}
+          </span>
+        </button>
       </div>
     </div>
   );
