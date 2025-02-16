@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-black text-white font-inter antialiased;
+    @apply bg-black text-white font-inter antialiased selection:bg-amber-500/20 selection:text-amber-500;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -166,8 +166,63 @@
            hover:bg-amber-500/10
            data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-500;
   }
+
+  /* Code Block */
+  .code-block {
+    @apply bg-black/50 rounded-lg p-4 font-mono text-sm
+           border border-amber-500/20
+           overflow-x-auto;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-amber-500/10 my-8;
+  }
+
+  /* Card Grid */
+  .card-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  /* Feature Card */
+  .feature-card {
+    @apply glass-panel p-6 hover:scale-105 transition-transform duration-300;
+  }
+
+  /* Stats Card */
+  .stats-card {
+    @apply glass-panel p-6 text-center;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    @apply min-h-screen flex items-center justify-center relative overflow-hidden
+           before:absolute before:inset-0 before:bg-gradient-to-b
+           before:from-black/80 before:to-transparent before:z-10;
+  }
+
+  /* Section Container */
+  .section-container {
+    @apply container mx-auto px-4 py-20;
+  }
+
+  /* Section Header */
+  .section-header {
+    @apply text-center mb-16;
+  }
+
+  /* Section Title */
+  .section-title {
+    @apply text-4xl font-bold gold-text mb-4;
+  }
+
+  /* Section Description */
+  .section-description {
+    @apply text-xl text-gray-400 max-w-3xl mx-auto;
+  }
 }
 
+/* Animations */
 @keyframes gradient-x {
   0%, 100% {
     background-position: 0% 50%;
