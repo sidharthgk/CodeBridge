@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import LoadingLogo from './LoadingLogo'; // Ensure this path is correct
+import LoadingLogo from './LoadingLogo';
 
 const LoadingScreen: React.FC = () => {
   return (

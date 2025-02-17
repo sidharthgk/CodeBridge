@@ -13,6 +13,7 @@ import ProjectLearning from "./pages/ProjectLearning";
 import ScratchMode from "./pages/ScratchMode";
 import ComparisonMode from "./pages/ComparisonMode";
 import PlaygroundPage from "./pages/PlaygroundPage";
+import AiAssistant from "./pages/AiAssistant";
 
 function App() {
   return (
@@ -26,32 +27,29 @@ function AppContent() {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [showPageLoader, setShowPageLoader] = useState(false);
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false); // ✅ Tracks if first load is done
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  // ✅ Initial App Load Animation (Runs Once)
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-      setInitialLoadComplete(true); // ✅ Marks initial load as complete
-    }, 2000); // Shows loading screen for 2 seconds initially
+      setInitialLoadComplete(true);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // ✅ Page Change Loader (Only Runs After Initial Load)
   useEffect(() => {
-    if (!initialLoadComplete) return; // ✅ Prevents route loader from triggering on first load
+    if (!initialLoadComplete) return;
 
     setShowPageLoader(true);
 
     const timer = setTimeout(() => {
       setShowPageLoader(false);
-    }, 1000); // Ensures smooth transition before showing page content
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [location]);
 
-  // ✅ If `LoadingScreen` is active, prevent page from rendering (Prevents flickering)
   if (isLoading || showPageLoader) {
     return <LoadingScreen />;
   }
@@ -74,6 +72,7 @@ function AppContent() {
             <Route path="/scratch-mode" element={<ScratchMode />} />
             <Route path="/comparison-mode" element={<ComparisonMode />} />
             <Route path="/playground" element={<PlaygroundPage />} />
+            <Route path="/ai-assistant" element={<AiAssistant />} />
           </Routes>
         </AnimatePresence>
       </Suspense>

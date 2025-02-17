@@ -9,7 +9,7 @@ const PlaygroundPage = () => {
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}sss
           className="grid gap-8"
         >
           <div className="glass-panel p-8">
