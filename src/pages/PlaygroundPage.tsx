@@ -5,11 +5,11 @@ import Playground from "../components/Playground";
 
 const PlaygroundPage = () => {
   return (
-    <div className="min-h-screen pt-20 px-4">
+      <div className="min-h-screen pt-20 px-4">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}sss
+          animate={{ opacity: 1, y: 0 }}
           className="grid gap-8"
         >
           <div className="glass-panel p-8">
