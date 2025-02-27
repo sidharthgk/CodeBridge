@@ -14,6 +14,7 @@ import ScratchMode from "./pages/ScratchMode";
 import ComparisonMode from "./pages/ComparisonMode";
 import PlaygroundPage from "./pages/PlaygroundPage";
 import AiAssistant from "./pages/AiAssistant";
+import Particles from "./components/Particles"; // Import Particles
 
 function App() {
   return (
@@ -55,8 +56,22 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black -z-10" />
+    <div className="relative">
+      {/* Particle Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black" />
+        <Particles
+          particleColors={["#ffffff", "#ffffff"]}
+          particleCount={700}
+          particleSpread={20}
+          speed={0.1}
+          particleBaseSize={100}
+          moveParticlesOnHover={true}
+          alphaParticles={false}
+          disableRotation={false}
+        />
+      </div>
+
       <Navbar />
 
       <Suspense fallback={<LoadingScreen />}>

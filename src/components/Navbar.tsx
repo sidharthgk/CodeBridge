@@ -8,13 +8,16 @@ import {
   X,
   ChevronDown,
   User,
+  Home,
+  Code,
+  Layout,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
   const ticking = useRef(false);
 
   useEffect(() => {
@@ -46,8 +49,8 @@ const Navbar = () => {
       title: "Learn",
       icon: GraduationCap,
       dropdownItems: [
-        { label: "Dashboard", path: "/dashboard" },
-        { label: "Courses", path: "/courses" },
+        { label: "Scratch Mode", path: "/scratch-mode" },
+        { label: "Comparison Mode", path: "/comparison-mode" },
         { label: "Practice", path: "/practice" },
       ],
     },
@@ -57,6 +60,7 @@ const Navbar = () => {
       dropdownItems: [
         { label: "Code Converter", path: "/code-converter" },
         { label: "Playground", path: "/playground" },
+        { label: "AI Assistant", path: "/ai-assistant" },
       ],
     },
     {
@@ -69,18 +73,29 @@ const Navbar = () => {
     },
   ];
 
+  // Navigation items that don't have dropdowns
+  const navItems = [
+    { title: "Dashboard", icon: Layout, path: "/dashboard" },
+  ];
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "py-3 bg-black/40 backdrop-blur-md shadow-md" : "py-5 bg-black/20"
-      } border-b border-amber-500`}
+        scrolled 
+          ? "py-2 bg-black/60 backdrop-blur-md shadow-lg" 
+          : "py-4 bg-gradient-to-b from-black/80 to-black/20"
+      } border-b border-amber-500/30`}
       style={{ willChange: "transform, opacity", backfaceVisibility: "hidden" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <a href="/" className="group flex items-center space-x-3">
-            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="relative p-2">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 rounded-lg blur-lg" />
+          {/* Logo */}
+          <Link to="/" className="group flex items-center space-x-3">
+            <motion.div 
+              whileHover={{ scale: 1.1, rotate: 5 }} 
+              className="relative p-2"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 rounded-full blur-md" />
               <div className="relative text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500">
                 &lt;/&gt;
               </div>
@@ -91,195 +106,227 @@ const Navbar = () => {
             >
               CodeBridge
             </motion.span>
-          </a>
+          </Link>
 
-          <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated && (
-              <>
-                {menuItems.map((item) => (
-                  <div
-                    key={item.title}
-                    className="relative"
-                    onMouseEnter={() => setActiveDropdown(item.title)}
-                    onMouseLeave={() => setActiveDropdown(null)}
-                  >
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            {/* Regular nav items (Dashboard) */}
+            {navItems.map((item) => (
+              <Link
+                key={item.title}
+                to={item.path}
+                className="group"
+              >
+                <motion.div
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg"
+                  whileHover={{ 
+                    backgroundColor: "rgba(245, 158, 11, 0.1)",
+                    scale: 1.05
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <item.icon className="h-4 w-4 text-amber-500 group-hover:text-amber-400 transition-colors" />
+                  <span className="text-gray-200 group-hover:text-amber-500 transition-colors font-medium">
+                    {item.title}
+                  </span>
+                </motion.div>
+              </Link>
+            ))}
+            
+            {/* Dropdown menus */}
+            {menuItems.map((item) => (
+              <div
+                key={item.title}
+                className="relative"
+                onMouseEnter={() => setActiveDropdown(item.title)}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <motion.div
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer group"
+                  whileHover={{ 
+                    backgroundColor: "rgba(245, 158, 11, 0.1)",
+                    scale: 1.05
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <item.icon className="h-4 w-4 text-amber-500 group-hover:text-amber-400 transition-colors" />
+                  <span className="text-gray-200 group-hover:text-amber-500 transition-colors font-medium">
+                    {item.title}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 text-amber-500 transition-transform duration-300 ${
+                    activeDropdown === item.title ? "rotate-180" : ""
+                  }`} />
+                </motion.div>
+                <AnimatePresence>
+                  {activeDropdown === item.title && (
                     <motion.div
-                      className="flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer"
-                      whileHover={{ backgroundColor: "rgba(245, 158, 11, 0.1)" }}
+                      initial={{ opacity: 0, y: 10, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: "auto" }}
+                      exit={{ opacity: 0, y: 10, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-1 w-56 rounded-xl bg-black/70 backdrop-blur-xl border border-amber-500/20 shadow-lg shadow-amber-500/5 overflow-hidden"
                     >
-                      <item.icon className="h-4 w-4 text-amber-500" />
-                      <span className="text-gray-200 hover:text-amber-500 transition-colors">
-                        {item.title}
-                      </span>
-                      <ChevronDown className="h-4 w-4 text-amber-500" />
-                    </motion.div>
-                    <AnimatePresence>
-                      {activeDropdown === item.title && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute top-full left-0 mt-2 w-48 rounded-lg bg-black/50 backdrop-blur-md border border-amber-500/20 shadow-lg"
+                      {item.dropdownItems.map((dropdownItem) => (
+                        <Link
+                          key={dropdownItem.label}
+                          to={dropdownItem.path}
+                          className="block px-4 py-3 text-sm text-gray-200 hover:bg-amber-500/10 hover:text-amber-500 transition-all border-b border-amber-500/10 last:border-0"
+                          onClick={closeMenu}
                         >
-                          {item.dropdownItems.map((dropdownItem) => (
-                            <a
-                              key={dropdownItem.label}
-                              href={dropdownItem.path}
-                              className="block px-4 py-2 text-sm text-gray-200 hover:bg-amber-500/10 hover:text-amber-500 transition-all"
-                            >
-                              {dropdownItem.label}
-                            </a>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </>
-            )}
-
-            <div className="pl-4 flex items-center space-x-4">
-              {isAuthenticated ? (
-                <>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <a
-                      href="/profile"
-                      className="flex items-center space-x-1 px-6 py-2 rounded-lg border border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all duration-300"
-                    >
-                      <User className="h-4 w-4" />
-                      <span>Profile</span>
-                    </a>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <button
-                      onClick={() => setIsAuthenticated(false)}
-                      className="px-6 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-semibold hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300"
-                    >
-                      Logout
-                    </button>
-                  </motion.div>
-                </>
-              ) : (
-                <>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <a
-                      href="/login"
-                      className="px-6 py-2 rounded-lg border border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all duration-300"
-                    >
-                      Login
-                    </a>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <a
-                      href="/signup"
-                      className="px-6 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-semibold hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300"
-                    >
-                      Get Started
-                    </a>
-                  </motion.div>
-                </>
-              )}
-            </div>
+                          {dropdownItem.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
           </div>
 
+          {/* Auth buttons */}
+          <div className="hidden md:flex items-center space-x-3">
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Link
+                to="/login"
+                className="px-5 py-2 rounded-lg border border-amber-500/30 text-amber-500 hover:bg-amber-500/10 transition-all duration-200 font-medium"
+              >
+                Login
+              </Link>
+            </motion.div>
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Link
+                to="/signup"
+                className="px-5 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-medium hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-200"
+              >
+                Get Started
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Mobile menu button */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden relative w-10 h-10 flex items-center justify-center"
+            aria-label="Toggle menu"
           >
-            {isOpen ? (
-              <X className="h-6 w-6 text-amber-500" />
-            ) : (
-              <Menu className="h-6 w-6 text-amber-500" />
-            )}
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ opacity: 0, rotate: -90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="h-6 w-6 text-amber-500" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ opacity: 0, rotate: 90 }}
+                  animate={{ opacity: 1, rotate: 0 }}
+                  exit={{ opacity: 0, rotate: -90 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="h-6 w-6 text-amber-500" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.button>
         </div>
       </div>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-black/40 backdrop-blur-md"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden bg-black/80 backdrop-blur-xl border-b border-amber-500/20"
           >
-            <div className="px-4 py-6 space-y-4">
-              {isAuthenticated && (
-                <>
-                  {menuItems.map((item) => (
-                    <div key={item.title}>
-                      <button
-                        className="flex items-center justify-between w-full px-4 py-2 text-amber-500"
-                        onClick={() => toggleDropdown(item.title)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </div>
-                        <ChevronDown
-                          className={`h-4 w-4 transform transition-transform ${
-                            activeDropdown === item.title ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
-                      {activeDropdown === item.title && (
-                        <div className="pl-6 space-y-2">
-                          {item.dropdownItems.map((dropdownItem) => (
-                            <a
-                              key={dropdownItem.label}
-                              href={dropdownItem.path}
-                              className="block text-gray-200 hover:text-amber-500"
-                              onClick={closeMenu}
-                            >
-                              {dropdownItem.label}
-                            </a>
-                          ))}
-                        </div>
-                      )}
+            <div className="px-4 py-4 space-y-3">
+              {/* Dashboard link in mobile menu */}
+              {navItems.map((item) => (
+                <Link
+                  key={item.title}
+                  to={item.path}
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-200 hover:text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors"
+                  onClick={closeMenu}
+                >
+                  <item.icon className="h-5 w-5 text-amber-500" />
+                  <span className="font-medium">{item.title}</span>
+                </Link>
+              ))}
+              
+              {/* Dropdown menus in mobile */}
+              {menuItems.map((item) => (
+                <div key={item.title} className="rounded-lg overflow-hidden">
+                  <button
+                    className="flex items-center justify-between w-full px-4 py-3 text-gray-200 hover:text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors"
+                    onClick={() => toggleDropdown(item.title)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <item.icon className="h-5 w-5 text-amber-500" />
+                      <span className="font-medium">{item.title}</span>
                     </div>
-                  ))}
-                </>
-              )}
-              <div className="border-t border-[0.5px] border-amber-500 pt-4">
-                {isAuthenticated ? (
-                  <>
-                    <a
-                      href="/profile"
-                      className="block px-4 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors"
-                      onClick={closeMenu}
-                    >
-                      Profile
-                    </a>
-                    <button
-                      onClick={() => {
-                        setIsAuthenticated(false);
-                        closeMenu();
-                      }}
-                      className="w-full text-left px-4 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <a
-                      href="/login"
-                      className="block px-4 py-2 text-amber-500 hover:bg-amber-500/10 transition-colors"
-                      onClick={closeMenu}
-                    >
-                      Login
-                    </a>
-                    <a
-                      href="/signup"
-                      className="block px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-semibold rounded-lg hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300"
-                      onClick={closeMenu}
-                    >
-                      Get Started
-                    </a>
-                  </>
-                )}
+                    <ChevronDown
+                      className={`h-5 w-5 text-amber-500 transform transition-transform duration-300 ${
+                        activeDropdown === item.title ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {activeDropdown === item.title && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="pl-12 space-y-1 pb-2"
+                      >
+                        {item.dropdownItems.map((dropdownItem) => (
+                          <Link
+                            key={dropdownItem.label}
+                            to={dropdownItem.path}
+                            className="block py-2 px-4 text-gray-300 hover:text-amber-500 transition-colors rounded-lg"
+                            onClick={closeMenu}
+                          >
+                            {dropdownItem.label}
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+              
+              {/* Auth in mobile menu */}
+              <div className="pt-3 space-y-3 border-t border-amber-500/20">
+                <Link
+                  to="/login"
+                  className="block px-4 py-3 text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors text-center font-medium"
+                  onClick={closeMenu}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="block px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-medium rounded-lg hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 text-center"
+                  onClick={closeMenu}
+                >
+                  Get Started
+                </Link>
               </div>
             </div>
           </motion.div>
