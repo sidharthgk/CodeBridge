@@ -10,7 +10,6 @@ const Login = () => {
     email: '',
     password: '',
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you would validate credentials here
