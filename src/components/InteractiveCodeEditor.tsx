@@ -20,6 +20,10 @@ import {
   ChevronUp
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useSettingsStore } from "../store/settingsStore";
+import { useCodeStore } from "../store/codeStore";
+import { useCodeExecution } from "../hooks/useCodeExecution";
+import { useCodeAnalysis } from "../hooks/useCodeAnalysis";
 
 interface InteractiveCodeEditorProps {
   initialCode?: string;
@@ -32,7 +36,7 @@ interface InteractiveCodeEditorProps {
   onCodeChange?: (code: string) => void;
   onLanguageChange?: (language: string) => void;
   className?: string;
-  sourceComponent?: string; // To track where the code is coming from
+  sourceComponent?: string;
 }
 
 const InteractiveCodeEditor: React.FC<InteractiveCodeEditorProps> = ({
@@ -50,7 +54,6 @@ const InteractiveCodeEditor: React.FC<InteractiveCodeEditorProps> = ({
 }) => {
   const navigate = useNavigate();
   const [language, setLanguage] = useState(initialLanguage);
-  const [theme, setTheme] = useState("hc-black");
   const [code, setCode] = useState(initialCode || getInitialCode(initialLanguage));
   const [isRunning, setIsRunning] = useState(false);
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
@@ -58,10 +61,13 @@ const InteractiveCodeEditor: React.FC<InteractiveCodeEditorProps> = ({
   const [displayOutput, setDisplayOutput] = useState(false);
   const [output, setOutput] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [fontSize, setFontSize] = useState(14);
-  const [wordWrap, setWordWrap] = useState("off");
-  const [autoIndent, setAutoIndent] = useState(true);
   const editorRef = useRef<any>(null);
+
+  // Store hooks
+  const { editorSettings, updateEditorSettings } = useSettingsStore();
+  const { addSnippet, formatCode, addRecentLanguage } = useCodeStore();
+  const { executeCode, isExecuting } = useCodeExecution();
+  const { analyzeCode, analysis } = useCodeAnalysis();
 
   useEffect(() => {
     if (initialCode) {
@@ -72,8 +78,9 @@ const InteractiveCodeEditor: React.FC<InteractiveCodeEditorProps> = ({
   useEffect(() => {
     if (initialLanguage) {
       setLanguage(initialLanguage);
+      addRecentLanguage(initialLanguage);
     }
-  }, [initialLanguage]);
+  }, [initialLanguage, addRecentLanguage]);
 
   interface CodeExamples {
     [key: string]: string;
@@ -135,6 +142,7 @@ fn main() {
 
   const handleLanguageChange = (newLang: string) => {
     setLanguage(newLang);
+    addRecentLanguage(newLang);
     if (!initialCode) {
       setCode(getInitialCode(newLang));
     }
@@ -167,9 +175,24 @@ fn main() {
     }
   };
 
+  const handleSaveSnippet = () => {
+    try {
+      addSnippet({
+        code,
+        language,
+        title: `${language} Snippet`,
+        description: "Code snippet created from editor"
+      });
+      toast.success("Snippet saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save snippet");
+    }
+  };
+
   const handleDownloadCode = () => {
     try {
-      const blob = new Blob([code], { type: "text/plain" });
+      const formattedCode = formatCode(code, language);
+      const blob = new Blob([formattedCode], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -182,39 +205,36 @@ fn main() {
     }
   };
 
-  const getOutputForCode = () => {
-    const outputs: CodeExamples = {
-      python: "Hello, World!",
-      javascript: "Hello, World!",
-      typescript: "Hello, World!",
-      java: "Hello, World!",
-      cpp: "Hello, World!",
-      rust: "Hello, World!"
-    };
-    return outputs[language] || "Hello, World!";
-  };
-
-  const handleRunCode = () => {
+  const handleRunCode = async () => {
     setIsRunning(true);
-    // Simulate code execution
-    setTimeout(() => {
-      setIsRunning(false);
-      setOutput(getOutputForCode());
+    try {
+      const result = await executeCode(code, language);
+      setOutput(result.output);
       setDisplayOutput(true);
-    }, 1000);
+      
+      // Analyze code after successful execution
+      const codeAnalysis = analyzeCode(code, language);
+      if (codeAnalysis.suggestions.length > 0) {
+        toast.success("Code analysis complete", {
+          duration: 5000,
+          icon: "💡"
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to execute code");
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleAskAI = () => {
-    // Store the code in localStorage to retrieve it in the AI Assistant page
     localStorage.setItem("codeForAI", code);
     localStorage.setItem("languageForAI", language);
     
-    // Store source component if provided
     if (sourceComponent) {
       localStorage.setItem("sourceComponent", sourceComponent);
     }
     
-    // Navigate to AI Assistant page
     navigate("/ai-assistant");
   };
 
@@ -255,8 +275,8 @@ fn main() {
             <div className="flex items-center space-x-2 px-3 py-1.5 bg-amber-500/10 rounded-lg border border-amber-500/20 hover:bg-amber-500/20 transition-colors">
               <Settings className="h-4 w-4 text-amber-500" />
               <select
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
+                value={editorSettings.theme}
+                onChange={(e) => updateEditorSettings({ theme: e.target.value })}
                 className="bg-transparent text-amber-500 outline-none text-sm hover:text-amber-400 transition-colors cursor-pointer"
               >
                 <option value="vs-dark" className="bg-black">Dark</option>
@@ -292,6 +312,13 @@ fn main() {
                 )}
               </button>
             </div>
+            <button
+              onClick={handleSaveSnippet}
+              className="p-2 hover:bg-amber-500/10 rounded-lg transition-colors group"
+              title="Save snippet"
+            >
+              <Save className="h-4 w-4 text-amber-500 group-hover:scale-110 transition-transform" />
+            </button>
             <button
               onClick={handleDownloadCode}
               className="p-2 hover:bg-amber-500/10 rounded-lg transition-colors group"
@@ -342,18 +369,18 @@ fn main() {
                   type="range"
                   min="10"
                   max="24"
-                  value={fontSize}
-                  onChange={(e) => setFontSize(parseInt(e.target.value))}
+                  value={editorSettings.fontSize}
+                  onChange={(e) => updateEditorSettings({ fontSize: parseInt(e.target.value) })}
                   className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                 />
-                <span className="ml-2 text-gray-300 w-8 text-center">{fontSize}</span>
+                <span className="ml-2 text-gray-300 w-8 text-center">{editorSettings.fontSize}</span>
               </div>
             </div>
             <div>
               <label className="block text-gray-300 text-sm mb-1">Word Wrap</label>
               <select
-                value={wordWrap}
-                onChange={(e) => setWordWrap(e.target.value)}
+                value={editorSettings.wordWrap}
+                onChange={(e) => updateEditorSettings({ wordWrap: e.target.value as any })}
                 className="w-full bg-gray-800 text-gray-300 rounded-lg px-3 py-1.5 border border-gray-700"
               >
                 <option value="off">Off</option>
@@ -366,17 +393,17 @@ fn main() {
               <label className="block text-gray-300 text-sm mb-1">Auto Indent</label>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => setAutoIndent(true)}
+                  onClick={() => updateEditorSettings({ autoIndent: true })}
                   className={`px-3 py-1.5 rounded-lg ${
-                    autoIndent ? "bg-amber-500/20 text-amber-500" : "bg-gray-800 text-gray-300"
+                    editorSettings.autoIndent ? "bg-amber-500/20 text-amber-500" : "bg-gray-800 text-gray-300"
                   }`}
                 >
                   On
                 </button>
                 <button
-                  onClick={() => setAutoIndent(false)}
+                  onClick={() => updateEditorSettings({ autoIndent: false })}
                   className={`px-3 py-1.5 rounded-lg ${
-                    !autoIndent ? "bg-amber-500/20 text-amber-500" : "bg-gray-800 text-gray-300"
+                    !editorSettings.autoIndent ? "bg-amber-500/20 text-amber-500" : "bg-gray-800 text-gray-300"
                   }`}
                 >
                   Off
@@ -395,22 +422,23 @@ fn main() {
             height={isFullscreen ? "calc(100vh - 140px)" : height}
             language={language}
             value={code}
-            theme={theme}
+            theme={editorSettings.theme}
             onChange={handleCodeChange}
             onMount={handleEditorDidMount}
             options={{
-              fontSize: fontSize,
-              minimap: { enabled: false },
+              fontSize: editorSettings.fontSize,
+              minimap: { enabled: editorSettings.minimap },
               scrollBeyondLastLine: false,
               folding: true,
-              lineNumbers: "on",
+              lineNumbers: editorSettings.lineNumbers ? "on" : "off",
               roundedSelection: false,
               automaticLayout: true,
               padding: { top: 16 },
               suggestOnTriggerCharacters: true,
               hideCursorInOverviewRuler: true,
-              wordWrap: wordWrap,
-              autoIndent: autoIndent ? "advanced" : "none",
+              wordWrap: editorSettings.wordWrap,
+              autoIndent: editorSettings.autoIndent ? "advanced" : "none",
+              tabSize: editorSettings.tabSize,
               scrollbar: {
                 vertical: 'visible',
                 horizontal: 'visible',
@@ -462,10 +490,15 @@ fn main() {
             <div className="px-2 py-1 rounded-md bg-amber-500/5">
               {code.split("\n").length} lines
             </div>
+            {analysis && (
+              <div className="px-2 py-1 rounded-md bg-amber-500/5">
+                Complexity: {analysis.complexity}
+              </div>
+            )}
           </div>
           <button
             onClick={handleRunCode}
-            disabled={isRunning}
+            disabled={isExecuting}
             className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 
                      text-black font-medium shadow-lg shadow-amber-500/20 
                      transition-all duration-300 hover:shadow-amber-500/30 
@@ -473,12 +506,12 @@ fn main() {
                      disabled:opacity-50 disabled:cursor-not-allowed
                      disabled:hover:scale-100 disabled:hover:shadow-none"
           >
-            {isRunning ? (
+            {isExecuting ? (
               <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (
               <Play className="h-4 w-4" />
             )}
-            <span>{isRunning ? "Running..." : "Run Code"}</span>
+            <span>{isExecuting ? "Running..." : "Run Code"}</span>
           </button>
         </div>
       )}

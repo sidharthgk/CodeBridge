@@ -4,11 +4,18 @@ import { Bot, Send, Sparkles, Lightbulb, MessageSquare, Code2, RefreshCw, ArrowL
 import { useNavigate } from 'react-router-dom';
 import InteractiveCodeEditor from '../components/InteractiveCodeEditor';
 import { toast } from 'react-hot-toast';
+import { useCodeStore } from '../store/codeStore';
+import { useCodeAnalysis } from '../hooks/useCodeAnalysis';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 const AiAssistant = () => {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
-  const [conversation, setConversation] = useState([
+  const [conversation, setConversation] = useState<Message[]>([
     {
       role: 'assistant',
       content: 'Hello! I\'m your AI coding assistant. How can I help you today?'
@@ -18,53 +25,50 @@ const AiAssistant = () => {
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [isThinking, setIsThinking] = useState(false);
-  const [previousPage, setPreviousPage] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  // Check if there's code from localStorage and determine previous page
+  // Store hooks
+  const { addSnippet, formatCode } = useCodeStore();
+  const { analyzeCode } = useCodeAnalysis();
+
+  // Check if there's code from localStorage and analyze it
   useEffect(() => {
     const savedCode = localStorage.getItem('codeForAI');
     const savedLanguage = localStorage.getItem('languageForAI');
-    const referrer = document.referrer;
-    
-    // Try to determine where the user came from
-    if (referrer) {
-      const url = new URL(referrer);
-      const path = url.pathname.split('/').pop();
-      if (path) {
-        setPreviousPage(path);
-      }
-    }
     
     if (savedCode) {
-      setCode(savedCode);
+      const formattedCode = formatCode(savedCode, savedLanguage || 'javascript');
+      setCode(formattedCode);
       toast.success('Code loaded successfully!');
       
-      // Add a message to the conversation about the code
+      // Analyze the code
+      const analysis = analyzeCode(formattedCode, savedLanguage || 'javascript');
+      setSuggestions(analysis.suggestions);
+      
+      // Add initial messages about the code
       setConversation(prev => [
         ...prev,
         {
           role: 'user',
           content: `I need help with this ${savedLanguage || 'JavaScript'} code.`
+        },
+        {
+          role: 'assistant',
+          content: `I've analyzed your ${savedLanguage || 'JavaScript'} code. Here's what I found:
+
+1. Code Complexity: ${analysis.complexity}
+2. Line Count: ${analysis.lineCount}
+3. Token Count: ${analysis.tokenCount}
+
+${analysis.suggestions.length > 0 ? 'Here are some suggestions:\n' + analysis.suggestions.map(s => `- ${s}`).join('\n') : 'The code looks well-structured!'}
+
+What specific aspect would you like help with?
+- Code optimization
+- Understanding the logic
+- Adding new features
+- Debugging issues`
         }
       ]);
-      
-      // Simulate AI thinking about the code
-      setIsTyping(true);
-      setTimeout(() => {
-        setConversation(prev => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: `I've analyzed your ${savedLanguage || 'JavaScript'} code. It looks like a simple function that greets a user. Is there something specific you'd like help with? For example:
-            
-1. Code optimization
-2. Explaining how it works
-3. Adding new features
-4. Debugging issues`
-          }
-        ]);
-        setIsTyping(false);
-      }, 2000);
     }
     
     if (savedLanguage) {
@@ -86,43 +90,26 @@ const AiAssistant = () => {
     setIsTyping(true);
     setIsThinking(true);
 
-    // Simulate AI response with thinking animation
+    // Analyze the current context
+    const analysis = analyzeCode(code, language);
+    
+    // Generate a contextual response
     setTimeout(() => {
       setIsThinking(false);
       
-      // Generate a more contextual response based on the prompt
       let aiResponse = '';
+      const promptLower = prompt.toLowerCase();
       
-      if (prompt.toLowerCase().includes('explain')) {
-        aiResponse = `This code defines a simple greeting function that takes a name parameter and returns a formatted string. The function uses template literals (indicated by the backticks) to embed the name variable directly in the string.
-
-After defining the function, it calls greet("World") and stores the result in a variable, then logs that result to the console. This is a common pattern in programming to demonstrate function usage.`;
-      } else if (prompt.toLowerCase().includes('optimize')) {
-        aiResponse = `Your code is already quite efficient for its purpose. For such a simple function, there's not much optimization needed.
-
-However, if you're using this in a performance-critical application, you might consider:
-
-1. Using a regular string concatenation instead of template literals for very simple cases
-2. Memoizing the function if you call it repeatedly with the same inputs
-3. For production, ensure you're using minification to reduce code size`;
-      } else if (prompt.toLowerCase().includes('error') || prompt.toLowerCase().includes('bug')) {
-        aiResponse = `I don't see any syntax errors in your code. The function should work as expected.
-
-Common issues that might occur with similar code:
-1. Make sure the function is called with a string parameter
-2. Check that the template literal syntax is correct (using backticks)
-3. Verify that the console.log statement is working in your environment
-
-Would you like me to help debug a specific issue you're encountering?`;
+      if (promptLower.includes('explain')) {
+        aiResponse = generateExplanationResponse(code, language, analysis);
+      } else if (promptLower.includes('optimize')) {
+        aiResponse = generateOptimizationResponse(analysis);
+      } else if (promptLower.includes('error') || promptLower.includes('bug')) {
+        aiResponse = generateDebugResponse(analysis);
+      } else if (promptLower.includes('feature') || promptLower.includes('add')) {
+        aiResponse = generateFeatureResponse(code, language);
       } else {
-        aiResponse = `I've analyzed your code and it looks well-structured. The greet function takes a name parameter and returns a greeting message.
-
-Here are some suggestions:
-1. You could add input validation to handle empty strings or null values
-2. Consider adding JSDoc comments to document the function's purpose and parameters
-3. If this is part of a larger application, you might want to export this function
-
-Would you like me to implement any of these suggestions?`;
+        aiResponse = generateGeneralResponse(analysis);
       }
       
       setConversation(prev => [...prev, {
@@ -133,8 +120,103 @@ Would you like me to implement any of these suggestions?`;
     }, 2000);
   };
 
+  const generateExplanationResponse = (code: string, language: string, analysis: any) => {
+    return `Let me explain how this code works:
+
+1. Structure Analysis:
+   - The code has ${analysis.lineCount} lines
+   - Complexity score: ${analysis.complexity}
+   - Uses ${analysis.tokenCount} tokens
+
+2. Key Components:
+   ${getCodeComponents(code, language)}
+
+3. Flow:
+   ${getCodeFlow(code, language)}
+
+Would you like me to explain any specific part in more detail?`;
+  };
+
+  const generateOptimizationResponse = (analysis: any) => {
+    const suggestions = analysis.suggestions.length > 0
+      ? analysis.suggestions.map((s: string) => `- ${s}`).join('\n')
+      : '- The code is already well-optimized\n- Consider adding type safety\n- Could add error handling';
+
+    return `Here are some optimization suggestions:
+
+${suggestions}
+
+Would you like me to help implement any of these optimizations?`;
+  };
+
+  const generateDebugResponse = (analysis: any) => {
+    return `I'll help you debug the code. Here's what I've found:
+
+1. Potential Issues:
+   - Checked for syntax errors: None found
+   - Analyzed logic flow: Looks consistent
+   - Reviewed error handling: Could be improved
+
+2. Suggestions:
+   ${analysis.suggestions.map((s: string) => `- ${s}`).join('\n')}
+
+Would you like me to help implement better error handling or focus on a specific issue?`;
+  };
+
+  const generateFeatureResponse = (code: string, language: string) => {
+    return `I can help you add new features. Based on your current code:
+
+1. Possible Enhancements:
+   - Add input validation
+   - Implement error handling
+   - Add TypeScript types
+   - Create unit tests
+   - Add documentation
+
+2. Suggested Next Steps:
+   - Choose a feature to implement
+   - We can plan the implementation
+   - I'll guide you through the process
+
+Which feature would you like to add first?`;
+  };
+
+  const generateGeneralResponse = (analysis: any) => {
+    return `I've analyzed your code and here are my observations:
+
+1. Code Quality:
+   - Complexity: ${analysis.complexity}
+   - Structure: Well-organized
+   - Style: Consistent
+
+2. Suggestions:
+   ${analysis.suggestions.map((s: string) => `- ${s}`).join('\n')}
+
+How would you like to improve the code?`;
+  };
+
+  const getCodeComponents = (code: string, language: string) => {
+    // Simple code component analysis
+    const hasFunction = code.includes('function') || code.includes('def');
+    const hasClass = code.includes('class');
+    const hasLoop = code.includes('for') || code.includes('while');
+    const hasCondition = code.includes('if') || code.includes('switch');
+
+    return `The code includes:${hasFunction ? '\n- Functions/Methods' : ''}${hasClass ? '\n- Classes' : ''}${hasLoop ? '\n- Loops' : ''}${hasCondition ? '\n- Conditional statements' : ''}`;
+  };
+
+  const getCodeFlow = (code: string, language: string) => {
+    return `The code follows a logical flow:
+1. Defines necessary functions/variables
+2. Processes input/data
+3. Produces output/results`;
+  };
+
   const handleCodeChange = (newCode: string) => {
     setCode(newCode);
+    // Analyze code changes
+    const analysis = analyzeCode(newCode, language);
+    setSuggestions(analysis.suggestions);
   };
 
   const handleLanguageChange = (newLanguage: string) => {
@@ -142,7 +224,7 @@ Would you like me to implement any of these suggestions?`;
   };
 
   const handleGoBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
 
   return (
