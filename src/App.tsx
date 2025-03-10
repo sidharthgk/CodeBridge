@@ -17,6 +17,10 @@ const ScratchMode = lazy(() => import("./pages/ScratchMode"));
 const ComparisonMode = lazy(() => import("./pages/ComparisonMode"));
 const PlaygroundPage = lazy(() => import("./pages/PlaygroundPage"));
 const AiAssistant = lazy(() => import("./pages/AiAssistant"));
+const Docs = lazy(() => import("./pages/Docs"));
+const ScratchLesson = lazy(() => import("./pages/ScratchLesson"));
+const ComparisonModeLesson = lazy(() => import("./pages/ComparisonModeLesson"));
+
 
 function App() {
   return (
@@ -71,7 +75,7 @@ function AppContent() {
         <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black" />
         <Particles
           particleColors={["#ffffff", "#ffffff"]}
-          particleCount={window.innerWidth > 768 ? 700 : 300} // Optimize for mobile
+          particleCount= {900} // Optimize for mobile
           particleSpread={20}
           speed={0.1}
           particleBaseSize={100}
@@ -116,6 +120,34 @@ function AppContent() {
               }
             />
             <Route
+              path="/scratch-lesson"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <ScratchLesson />
+                </motion.div>
+              }
+            />
+                        <Route
+              path="/comparison-lesson"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <ComparisonModeLesson />
+                </motion.div>
+              }
+            />
+            <Route
               path="/signup"
               element={
                 <motion.div
@@ -140,6 +172,34 @@ function AppContent() {
                   transition={{ duration: 0.5 }}
                 >
                   <ModeSelection />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Signup />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/docs"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Docs />
                 </motion.div>
               }
             />

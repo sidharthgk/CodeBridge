@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Code2, Play, BookOpen, Trophy, GitBranch, Terminal } from 'lucide-react';
-import InteractiveCodeEditor from '../components/InteractiveCodeEditor';
+import { useNavigate } from 'react-router-dom';
+import { Code2, Play, BookOpen, Trophy, Terminal } from 'lucide-react';
 
 const languages = [
   { id: 'python', name: 'Python', icon: '🐍', description: 'Perfect for beginners, great for data science and automation.' },
@@ -13,14 +13,18 @@ const languages = [
   { id: 'go', name: 'Go', icon: '🐹', description: 'Build fast, reliable, and efficient software at scale.' }
 ];
 
-const LanguageCard = ({ language, selected, onSelect }: { 
-  language: typeof languages[0], 
-  selected: boolean,
-  onSelect: () => void 
+const LanguageCard = ({
+  language,
+  selected,
+  onSelect,
+}: {
+  language: typeof languages[0];
+  selected: boolean;
+  onSelect: () => void;
 }) => {
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
 
   return (
@@ -46,14 +50,18 @@ const LanguageCard = ({ language, selected, onSelect }: {
   );
 };
 
-const FeatureCard = ({ icon: Icon, title, description }: {
-  icon: any,
-  title: string,
-  description: string
+const FeatureCard = ({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: any;
+  title: string;
+  description: string;
 }) => {
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
 
   return (
@@ -74,16 +82,17 @@ const FeatureCard = ({ icon: Icon, title, description }: {
 };
 
 const ScratchMode = () => {
+  const navigate = useNavigate();
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
-  const [showEditor, setShowEditor] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
 
   const handleStartLearning = () => {
     if (selectedLanguage) {
-      setShowEditor(true);
+      // Instead of showing the editor here, navigate to your new ScratchLesson page
+      navigate(`/scratch-lesson?lang=${selectedLanguage}`);
     }
   };
 
@@ -109,102 +118,53 @@ const ScratchMode = () => {
           </div>
 
           {/* Language Selection */}
-          {!showEditor && (
-            <div className="glass-panel p-8">
-              <h2 className="text-xl font-bold mb-6">Choose Your Language</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                {languages.map((lang) => (
-                  <LanguageCard
-                    key={lang.id}
-                    language={lang}
-                    selected={selectedLanguage === lang.id}
-                    onSelect={() => setSelectedLanguage(lang.id)}
-                  />
-                ))}
-              </div>
+          <div className="glass-panel p-8">
+            <h2 className="text-xl font-bold mb-6">Choose Your Language</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {languages.map((lang) => (
+                <LanguageCard
+                  key={lang.id}
+                  language={lang}
+                  selected={selectedLanguage === lang.id}
+                  onSelect={() => setSelectedLanguage(lang.id)}
+                />
+              ))}
             </div>
-          )}
+          </div>
 
-          {/* Features */}
-          {!showEditor && (
-            <div ref={ref} className="grid md:grid-cols-3 gap-6">
-              <FeatureCard
-                icon={BookOpen}
-                title="Structured Learning"
-                description="Follow a carefully crafted curriculum designed for optimal learning progression."
-              />
-              <FeatureCard
-                icon={Terminal}
-                title="Interactive Exercises"
-                description="Practice with hands-on coding exercises and get instant feedback."
-              />
-              <FeatureCard
-                icon={Trophy}
-                title="Track Progress"
-                description="Earn achievements and track your learning journey with detailed analytics."
-              />
-            </div>
-          )}
+          {/* Feature Highlights */}
+          <div ref={ref} className="grid md:grid-cols-3 gap-6">
+            <FeatureCard
+              icon={BookOpen}
+              title="Structured Learning"
+              description="Follow a carefully crafted curriculum designed for optimal progression."
+            />
+            <FeatureCard
+              icon={Terminal}
+              title="Interactive Exercises"
+              description="Practice with hands-on coding exercises and get instant feedback."
+            />
+            <FeatureCard
+              icon={Trophy}
+              title="Track Progress"
+              description="Earn achievements and track your journey with detailed analytics."
+            />
+          </div>
 
           {/* Start Learning Button */}
-          {selectedLanguage && !showEditor && (
+          {selectedLanguage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-center"
             >
-              <button 
+              <button
                 className="btn-primary flex items-center space-x-2 group"
                 onClick={handleStartLearning}
               >
                 <Play className="h-5 w-5 group-hover:scale-110 transition-transform" />
                 <span>Start Learning {languages.find(l => l.id === selectedLanguage)?.name}</span>
               </button>
-            </motion.div>
-          )}
-
-          {/* Interactive Code Editor */}
-          {showEditor && selectedLanguage && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-8"
-            >
-              <div className="glass-panel p-6">
-                <h2 className="text-2xl font-bold mb-4 gold-text">
-                  {languages.find(l => l.id === selectedLanguage)?.name} Basics
-                </h2>
-                <p className="text-gray-400 mb-6">
-                  Let's start with the fundamentals. Here's a simple "Hello World" program in {languages.find(l => l.id === selectedLanguage)?.name}.
-                  Try running it and then modify it to see what happens!
-                </p>
-                
-                <InteractiveCodeEditor
-                  initialLanguage={selectedLanguage}
-                  height="400px"
-                  showAiButton={true}
-                  showHeader={true}
-                  showFooter={true}
-                  showOutput={true}
-                  sourceComponent="scratch-mode"
-                />
-              </div>
-
-              <div className="glass-panel p-6">
-                <h3 className="text-xl font-bold mb-4">Next Steps</h3>
-                <p className="text-gray-400 mb-4">
-                  Now that you've run your first program, here are some things you can try:
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-400 mb-6">
-                  <li>Change the greeting message</li>
-                  <li>Create a variable with your name and use it in the greeting</li>
-                  <li>Add comments to explain what the code does</li>
-                  <li>Try creating a function that takes multiple parameters</li>
-                </ul>
-                <p className="text-gray-400">
-                  If you get stuck, click the "Ask AI" button to get help from our AI assistant!
-                </p>
-              </div>
             </motion.div>
           )}
         </motion.div>

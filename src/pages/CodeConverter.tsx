@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GitCompare, Play, Download, Copy, Code2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+// Import the AI library
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const CodeConverter = () => {
   const [fromLanguage, setFromLanguage] = useState('javascript');
@@ -11,24 +13,27 @@ const CodeConverter = () => {
   const [isConverting, setIsConverting] = useState(false);
 
   const handleConvert = async () => {
+    if (!sourceCode) return;
     setIsConverting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Use your API key (inline here for demonstration)
+      const geminiApiKey = 'AIzaSyAL6kABn-Vf669bPbFAEcXf-35Xv9tGWAA';
+      const genAI = new GoogleGenerativeAI(geminiApiKey);
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       
-      if (fromLanguage === 'javascript' && toLanguage === 'python') {
-        const converted = sourceCode
-          .replace('const ', '')
-          .replace('let ', '')
-          .replace('var ', '')
-          .replace(';', '')
-          .replace('function ', 'def ')
-          .replace('===', '==')
-          .replace('{', ':')
-          .replace('}', '');
-        setConvertedCode(converted);
-        toast.success('Code converted successfully!');
-      }
+      // Build the prompt for code conversion
+      const prompt = `You are an expert programmer. Convert the following code from ${fromLanguage} to ${toLanguage}. Ensure that the converted code is accurate, efficient, and follows best practices for ${toLanguage}. Do not include any additional explanations or comments, only provide the converted code. Here is the code to convert:\n\n${sourceCode}`;
+      
+      const result = await model.generateContent(prompt);
+      const responseText =
+        typeof result.response.text === 'function'
+          ? result.response.text()
+          : result.response.text;
+      
+      setConvertedCode(responseText);
+      toast.success('Code converted successfully!');
     } catch (error) {
+      console.error('AI conversion error:', error);
       toast.error('Failed to convert code. Please try again.');
     } finally {
       setIsConverting(false);
@@ -70,7 +75,7 @@ const CodeConverter = () => {
   return (
     <div className="h-[calc(100vh-164px)] mt-[100px] px-6 pb-4">
       <div className="h-full flex flex-col">
-        {/* Header with three sections */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -89,9 +94,9 @@ const CodeConverter = () => {
             </div>
           </motion.div>
 
-          {/* Center: Select inputs with icon */}
+          {/* Center: Language Selectors */}
           <motion.div className="flex-1 flex justify-start items-center transform ml-40">
-          <div className="flex items-center space-x-3 bg-black/50 p-2 rounded-xl">
+            <div className="flex items-center space-x-3 bg-black/50 p-2 rounded-xl">
               <select
                 value={fromLanguage}
                 onChange={(e) => setFromLanguage(e.target.value)}
@@ -121,7 +126,7 @@ const CodeConverter = () => {
             </div>
           </motion.div>
 
-          {/* Right: Convert Button remains in place */}
+          {/* Right: Convert Button */}
           <motion.div className="flex items-center">
             <button
               onClick={handleConvert}
@@ -134,7 +139,7 @@ const CodeConverter = () => {
           </motion.div>
         </motion.div>
 
-        {/* Main content */}
+        {/* Main Content */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

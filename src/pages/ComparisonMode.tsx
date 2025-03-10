@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { GitCompare, Play, Zap, RefreshCw, BookOpen } from 'lucide-react';
+import { GitCompare, Play } from 'lucide-react';
+import Link from 'next/link';
 
 const languages = [
   { id: 'python', name: 'Python', icon: '🐍' },
@@ -9,7 +10,7 @@ const languages = [
   { id: 'java', name: 'Java', icon: '☕' },
   { id: 'cpp', name: 'C++', icon: '⚙️' },
   { id: 'rust', name: 'Rust', icon: '🦀' },
-  { id: 'go', name: 'Go', icon: '🐹' }
+  { id: 'go', name: 'Go', icon: '🐹' },
 ];
 
 const codeExamples: Record<string, string> = {
@@ -65,21 +66,22 @@ func greet(name string) string {
 func main() {
     result := greet("World")
     fmt.Println(result)
-}`
+}`,
 };
 
-const LanguageSelector = ({ 
-  selected, 
+// LanguageSelector component
+const LanguageSelector = ({
+  selected,
   onChange,
-  disabled = false
-}: { 
-  selected: string | null, 
-  onChange: (id: string) => void,
-  disabled?: boolean
+  disabled = false,
+}: {
+  selected: string | null;
+  onChange: (id: string) => void;
+  disabled?: boolean;
 }) => {
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
 
   return (
@@ -112,14 +114,14 @@ const LanguageSelector = ({
   );
 };
 
-// Individual language card for preview
+// Shows code for a single language
 const LanguageCard = ({ languageId }: { languageId: string }) => {
-  const language = languages.find(l => l.id === languageId);
+  const language = languages.find((l) => l.id === languageId);
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
-  
+
   return (
     <motion.div
       ref={ref}
@@ -141,9 +143,14 @@ const LanguageCard = ({ languageId }: { languageId: string }) => {
   );
 };
 
-// New component to show a compatibility score between two languages
-const CompatibilityCard = ({ source, target }: { source: string, target: string }) => {
-  // Hardcoded compatibility scores between languages
+// Calculates and displays a compatibility score
+const CompatibilityCard = ({
+  source,
+  target,
+}: {
+  source: string;
+  target: string;
+}) => {
   const compatibilityMatrix: Record<string, Record<string, number>> = {
     python: { javascript: 85, java: 70, cpp: 65, rust: 60, go: 75 },
     javascript: { python: 85, java: 80, cpp: 70, rust: 55, go: 80 },
@@ -162,7 +169,7 @@ const CompatibilityCard = ({ source, target }: { source: string, target: string 
 
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1
+    threshold: 0.1,
   });
 
   return (
@@ -179,8 +186,14 @@ const CompatibilityCard = ({ source, target }: { source: string, target: string 
   );
 };
 
-// Updated CodePreview component: two language cards side by side and compatibility score below
-const CodePreview = ({ sourceLanguage, targetLanguage }: { sourceLanguage: string, targetLanguage: string }) => {
+// Displays two languages side by side + compatibility
+const CodePreview = ({
+  sourceLanguage,
+  targetLanguage,
+}: {
+  sourceLanguage: string;
+  targetLanguage: string;
+}) => {
   return (
     <div className="glass-panel p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -194,49 +207,19 @@ const CodePreview = ({ sourceLanguage, targetLanguage }: { sourceLanguage: strin
   );
 };
 
-const FeatureCard = ({ icon: Icon, title, description }: {
-  icon: React.ComponentType<{ className?: string }>,
-  title: string,
-  description: string
-}) => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1
-  });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5 }}
-      className="glass-panel p-6"
-    >
-      <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
-        <Icon className="h-6 w-6 text-amber-500" />
-      </div>
-      <h3 className="text-lg font-bold mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm">{description}</p>
-    </motion.div>
-  );
-};
-
 const ComparisonMode = () => {
   const [sourceLanguage, setSourceLanguage] = useState<string | null>(null);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
 
-  // Refs to scroll into view
   const targetSelectorRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to the target language selector when sourceLanguage is selected
   useEffect(() => {
     if (sourceLanguage && !targetLanguage && targetSelectorRef.current) {
       targetSelectorRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [sourceLanguage, targetLanguage]);
 
-  // Scroll to the button when targetLanguage is selected
   useEffect(() => {
     if (targetLanguage && buttonRef.current) {
       buttonRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -251,7 +234,6 @@ const ComparisonMode = () => {
           animate={{ opacity: 1, y: 0 }}
           className="grid gap-8"
         >
-          {/* Header */}
           <div className="glass-panel p-8">
             <div className="flex items-center space-x-4 mb-6">
               <div className="h-16 w-16 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 flex items-center justify-center">
@@ -259,12 +241,13 @@ const ComparisonMode = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold gold-text">Language Comparison</h1>
-                <p className="text-gray-400">Learn by comparing different programming languages</p>
+                <p className="text-gray-400">
+                  Learn by comparing different programming languages
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Language Selection */}
           <div className="space-y-6 mb-10">
             <div>
               <h2 className="text-xl font-bold mb-4">Select Source Language</h2>
@@ -286,7 +269,6 @@ const ComparisonMode = () => {
             )}
           </div>
 
-          {/* Code Preview with language cards and compatibility score */}
           {sourceLanguage && targetLanguage && (
             <CodePreview
               sourceLanguage={sourceLanguage}
@@ -294,7 +276,6 @@ const ComparisonMode = () => {
             />
           )}
 
-          {/* Start Learning Button */}
           {sourceLanguage && targetLanguage && (
             <motion.div
               ref={buttonRef}
@@ -302,11 +283,14 @@ const ComparisonMode = () => {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-center mb-10"
             >
+              <Link href="/comparison-lesson">
               <button className="btn-primary flex items-center space-x-2 group">
                 <Play className="h-5 w-5 group-hover:scale-110 transition-transform" />
                 <span>Start Comparison Learning</span>
               </button>
+              </Link>
             </motion.div>
+            
           )}
         </motion.div>
       </div>

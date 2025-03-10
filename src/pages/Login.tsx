@@ -12,7 +12,7 @@ const Login = () => {
   });
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');
+    navigate('/mode-selection');
   };
 
   return (

@@ -5,73 +5,46 @@ import { useNavigate } from 'react-router-dom';
 import InteractiveCodeEditor from '../components/InteractiveCodeEditor';
 import { toast } from 'react-hot-toast';
 
+// Import the library
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 const AiAssistant = () => {
   const navigate = useNavigate();
+
+  // Chat state
   const [prompt, setPrompt] = useState('');
   const [conversation, setConversation] = useState([
     {
       role: 'assistant',
-      content: 'Hello! I\'m your AI coding assistant. How can I help you today?'
+      content: "Hello! I'm your AI coding assistant. How can I help you today?"
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
-  const [isThinking, setIsThinking] = useState(false);
-  const [previousPage, setPreviousPage] = useState('');
 
-  // Check if there's code from localStorage and determine previous page
+  // If you have environment variables, use them instead
+  // e.g. const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || '...';
+  const geminiApiKey = 'AIzaSyAL6kABn-Vf669bPbFAEcXf-35Xv9tGWAA'; // inline for demonstration
+
+  // Load initial code from local storage
   useEffect(() => {
     const savedCode = localStorage.getItem('codeForAI');
     const savedLanguage = localStorage.getItem('languageForAI');
-    const referrer = document.referrer;
-    
-    // Try to determine where the user came from
-    if (referrer) {
-      const url = new URL(referrer);
-      const path = url.pathname.split('/').pop();
-      if (path) {
-        setPreviousPage(path);
-      }
-    }
-    
     if (savedCode) {
       setCode(savedCode);
       toast.success('Code loaded successfully!');
-      
-      // Add a message to the conversation about the code
       setConversation(prev => [
         ...prev,
         {
           role: 'user',
-          content: `I need help with this ${savedLanguage || 'JavaScript'} code.`
+          content: ``
         }
       ]);
-      
-      // Simulate AI thinking about the code
-      setIsTyping(true);
-      setTimeout(() => {
-        setConversation(prev => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: `I've analyzed your ${savedLanguage || 'JavaScript'} code. It looks like a simple function that greets a user. Is there something specific you'd like help with? For example:
-            
-1. Code optimization
-2. Explaining how it works
-3. Adding new features
-4. Debugging issues`
-          }
-        ]);
-        setIsTyping(false);
-      }, 2000);
     }
-    
     if (savedLanguage) {
       setLanguage(savedLanguage);
     }
-    
-    // Clear the localStorage after loading
     localStorage.removeItem('codeForAI');
     localStorage.removeItem('languageForAI');
   }, []);
@@ -80,69 +53,54 @@ const AiAssistant = () => {
     e.preventDefault();
     if (!prompt.trim()) return;
 
-    // Add user message
+    // Add the user message to the conversation
     setConversation(prev => [...prev, { role: 'user', content: prompt }]);
-    setPrompt('');
     setIsTyping(true);
-    setIsThinking(true);
 
-    // Simulate AI response with thinking animation
-    setTimeout(() => {
-      setIsThinking(false);
-      
-      // Generate a more contextual response based on the prompt
-      let aiResponse = '';
-      
-      if (prompt.toLowerCase().includes('explain')) {
-        aiResponse = `This code defines a simple greeting function that takes a name parameter and returns a formatted string. The function uses template literals (indicated by the backticks) to embed the name variable directly in the string.
+    try {
+      // 1) Initialize the client
+      const genAI = new GoogleGenerativeAI(geminiApiKey);
+      // 2) Grab the model
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-After defining the function, it calls greet("World") and stores the result in a variable, then logs that result to the console. This is a common pattern in programming to demonstrate function usage.`;
-      } else if (prompt.toLowerCase().includes('optimize')) {
-        aiResponse = `Your code is already quite efficient for its purpose. For such a simple function, there's not much optimization needed.
-
-However, if you're using this in a performance-critical application, you might consider:
-
-1. Using a regular string concatenation instead of template literals for very simple cases
-2. Memoizing the function if you call it repeatedly with the same inputs
-3. For production, ensure you're using minification to reduce code size`;
-      } else if (prompt.toLowerCase().includes('error') || prompt.toLowerCase().includes('bug')) {
-        aiResponse = `I don't see any syntax errors in your code. The function should work as expected.
-
-Common issues that might occur with similar code:
-1. Make sure the function is called with a string parameter
-2. Check that the template literal syntax is correct (using backticks)
-3. Verify that the console.log statement is working in your environment
-
-Would you like me to help debug a specific issue you're encountering?`;
-      } else {
-        aiResponse = `I've analyzed your code and it looks well-structured. The greet function takes a name parameter and returns a greeting message.
-
-Here are some suggestions:
-1. You could add input validation to handle empty strings or null values
-2. Consider adding JSDoc comments to document the function's purpose and parameters
-3. If this is part of a larger application, you might want to export this function
-
-Would you like me to implement any of these suggestions?`;
+      // 3) Build a single string prompt that includes the code + user’s new question
+      let combinedPrompt = '';
+      if (code) {
+        combinedPrompt += `User's code:\n${code}\n\n`;
       }
-      
-      setConversation(prev => [...prev, {
-        role: 'assistant',
-        content: aiResponse
-      }]);
+      combinedPrompt += `User's question:\n${prompt}\n\nAI Reply:`;
+
+      // 4) Call generateContent
+      const result = await model.generateContent(combinedPrompt);
+      const responseText = typeof result.response.text === 'function'
+        ? result.response.text()
+        : result.response.text;
+
+      // 5) Add the AI reply to conversation
+      setConversation(prev => [...prev, { role: 'assistant', content: responseText }]);
+    } catch (error) {
+      console.error('Gemini error:', error);
+      setConversation(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: 'Sorry, I ran into an error. Please try again.'
+        }
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 2000);
+      setPrompt('');
+    }
   };
 
   const handleCodeChange = (newCode: string) => {
     setCode(newCode);
   };
-
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
   };
-
   const handleGoBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
 
   return (
@@ -165,7 +123,7 @@ Would you like me to implement any of these suggestions?`;
                   <p className="text-gray-400">Get expert help with your code</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handleGoBack}
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-black/40 border border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all"
               >
@@ -196,26 +154,19 @@ Would you like me to implement any of these suggestions?`;
                     </div>
                   </div>
                 ))}
+                {/* If user is typing, show a small “AI is thinking” or “User is typing” indicator */}
                 {isTyping && (
                   <div className="flex justify-start">
                     <div className="bg-black/60 text-gray-200 p-4 rounded-lg border border-gray-800 max-w-[90%]">
-                      {isThinking ? (
-                        <div className="flex flex-col space-y-2">
-                          <div className="text-sm text-amber-500">Analyzing your code...</div>
-                          <div className="flex space-x-2">
-                            <RefreshCw className="h-4 w-4 text-amber-500 animate-spin" />
-                            <div className="h-4 w-4 bg-gray-700 rounded-full animate-pulse" />
-                            <div className="h-4 w-4 bg-gray-700 rounded-full animate-pulse [animation-delay:0.2s]" />
-                            <div className="h-4 w-4 bg-gray-700 rounded-full animate-pulse [animation-delay:0.4s]" />
-                          </div>
-                        </div>
-                      ) : (
+                      <div className="flex flex-col space-y-2">
+                        <div className="text-sm text-amber-500">Analyzing your code...</div>
                         <div className="flex space-x-2">
-                          <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce" />
-                          <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce [animation-delay:0.2s]" />
-                          <div className="w-2 h-2 bg-amber-500 rounded-full animate-bounce [animation-delay:0.4s]" />
+                          <RefreshCw className="h-4 w-4 text-amber-500 animate-spin" />
+                          <div className="h-4 w-4 bg-gray-700 rounded-full animate-pulse" />
+                          <div className="h-4 w-4 bg-gray-700 rounded-full animate-pulse [animation-delay:0.2s]" />
+                          <div className="h-4 w-4 bg-gray-700 rounded-full animate-pulse [animation-delay:0.4s]" />
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -254,13 +205,13 @@ Would you like me to implement any of these suggestions?`;
               <InteractiveCodeEditor
                 initialCode={code}
                 initialLanguage={language}
-                height="500px"
+                height="380px"
                 showAiButton={false}
                 showHeader={true}
                 showFooter={true}
                 showOutput={true}
-                onCodeChange={handleCodeChange}
-                onLanguageChange={handleLanguageChange}
+                onCodeChange={newCode => setCode(newCode)}
+                onLanguageChange={newLang => setLanguage(newLang)}
               />
             </div>
           </div>
@@ -270,17 +221,23 @@ Would you like me to implement any of these suggestions?`;
             <div className="glass-panel p-6 bg-black/40 backdrop-blur-md border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300">
               <Lightbulb className="h-8 w-8 text-amber-500 mb-4" />
               <h3 className="text-lg font-semibold mb-2">Smart Suggestions</h3>
-              <p className="text-gray-400">Get intelligent code suggestions and best practices as you write.</p>
+              <p className="text-gray-400">
+                Get intelligent code suggestions and best practices as you write.
+              </p>
             </div>
             <div className="glass-panel p-6 bg-black/40 backdrop-blur-md border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300">
               <MessageSquare className="h-8 w-8 text-amber-500 mb-4" />
               <h3 className="text-lg font-semibold mb-2">Natural Conversations</h3>
-              <p className="text-gray-400">Ask questions in plain English and get clear, helpful responses.</p>
+              <p className="text-gray-400">
+                Ask questions in plain English and get clear, helpful responses.
+              </p>
             </div>
             <div className="glass-panel p-6 bg-black/40 backdrop-blur-md border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300">
               <Code2 className="h-8 w-8 text-amber-500 mb-4" />
               <h3 className="text-lg font-semibold mb-2">Code Explanations</h3>
-              <p className="text-gray-400">Get detailed explanations of code snippets and concepts.</p>
+              <p className="text-gray-400">
+                Get detailed explanations of code snippets and concepts.
+              </p>
             </div>
           </div>
         </motion.div>

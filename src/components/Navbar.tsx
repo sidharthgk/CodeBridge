@@ -51,7 +51,6 @@ const Navbar = () => {
       dropdownItems: [
         { label: "Scratch Mode", path: "/scratch-mode" },
         { label: "Comparison Mode", path: "/comparison-mode" },
-        { label: "Practice", path: "/practice" },
       ],
     },
     {
@@ -71,11 +70,6 @@ const Navbar = () => {
         { label: "Documentation", path: "/docs" },
       ],
     },
-  ];
-
-  // Navigation items that don't have dropdowns
-  const navItems = [
-    { title: "Dashboard", icon: Layout, path: "/dashboard" },
   ];
 
   return (
@@ -108,32 +102,8 @@ const Navbar = () => {
             </motion.span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation (Dropdown menus only) */}
           <div className="hidden md:flex items-center space-x-1">
-            {/* Regular nav items (Dashboard) */}
-            {navItems.map((item) => (
-              <Link
-                key={item.title}
-                to={item.path}
-                className="group"
-              >
-                <motion.div
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg"
-                  whileHover={{ 
-                    backgroundColor: "rgba(245, 158, 11, 0.1)",
-                    scale: 1.05
-                  }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <item.icon className="h-4 w-4 text-amber-500 group-hover:text-amber-400 transition-colors" />
-                  <span className="text-gray-200 group-hover:text-amber-500 transition-colors font-medium">
-                    {item.title}
-                  </span>
-                </motion.div>
-              </Link>
-            ))}
-            
-            {/* Dropdown menus */}
             {menuItems.map((item) => (
               <div
                 key={item.title}
@@ -257,19 +227,6 @@ const Navbar = () => {
             className="md:hidden bg-black/80 backdrop-blur-xl border-b border-amber-500/20"
           >
             <div className="px-4 py-4 space-y-3">
-              {/* Dashboard link in mobile menu */}
-              {navItems.map((item) => (
-                <Link
-                  key={item.title}
-                  to={item.path}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-200 hover:text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors"
-                  onClick={closeMenu}
-                >
-                  <item.icon className="h-5 w-5 text-amber-500" />
-                  <span className="font-medium">{item.title}</span>
-                </Link>
-              ))}
-              
               {/* Dropdown menus in mobile */}
               {menuItems.map((item) => (
                 <div key={item.title} className="rounded-lg overflow-hidden">
@@ -310,7 +267,7 @@ const Navbar = () => {
                   </AnimatePresence>
                 </div>
               ))}
-              
+
               {/* Auth in mobile menu */}
               <div className="pt-3 space-y-3 border-t border-amber-500/20">
                 <Link

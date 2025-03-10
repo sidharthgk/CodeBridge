@@ -20,6 +20,8 @@ import {
   ChevronUp
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+// Import the Gemini API library
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface InteractiveCodeEditorProps {
   initialCode?: string;
@@ -182,26 +184,33 @@ fn main() {
     }
   };
 
-  const getOutputForCode = () => {
-    const outputs: CodeExamples = {
-      python: "Hello, World!",
-      javascript: "Hello, World!",
-      typescript: "Hello, World!",
-      java: "Hello, World!",
-      cpp: "Hello, World!",
-      rust: "Hello, World!"
-    };
-    return outputs[language] || "Hello, World!";
-  };
-
-  const handleRunCode = () => {
+  // Updated: Execute the code by calling the Gemini API
+  const handleRunCode = async () => {
     setIsRunning(true);
-    // Simulate code execution
-    setTimeout(() => {
-      setIsRunning(false);
-      setOutput(getOutputForCode());
+    try {
+      // Inline API key for demonstration purposes.
+      const geminiApiKey = "AIzaSyAL6kABn-Vf669bPbFAEcXf-35Xv9tGWAA";
+      const genAI = new GoogleGenerativeAI(geminiApiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      
+      // Build a prompt to simulate code execution in the specified language.
+      const prompt = `Simulate running the following ${language} code and provide the output:\n\n${code}`;
+      
+      const result = await model.generateContent(prompt);
+      const responseText =
+        typeof result.response.text === "function"
+          ? result.response.text()
+          : result.response.text;
+      
+      setOutput(responseText);
       setDisplayOutput(true);
-    }, 1000);
+      toast.success("Code executed successfully!");
+    } catch (error) {
+      console.error("Code execution error:", error);
+      toast.error("Failed to execute code. Please try again.");
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleAskAI = () => {

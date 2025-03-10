@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -13,8 +14,8 @@ const Signup = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-  };
+    navigate('/mode-selection');
+    };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
