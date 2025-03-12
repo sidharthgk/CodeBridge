@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import LoadingScreen from "./components/LoadingScreen";
-import Particles from "./components/Particles"; // Import Particles
+import Particles from "./components/Particles"; 
 
-// Lazy loading pages for better performance
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
