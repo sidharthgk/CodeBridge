@@ -19,6 +19,10 @@ const ComparisonMode = lazy(() => import("./pages/ComparisonMode"));
 const PlaygroundPage = lazy(() => import("./pages/PlaygroundPage"));
 const AiAssistant = lazy(() => import("./pages/AiAssistant"));
 
+// ADD THESE
+const ScratchLesson = lazy(() => import("./pages/ScratchLesson"));
+const ComparisonLesson = lazy(() => import("./pages/ComparisonModeLesson"));
+
 function App() {
   return (
     <Router>
@@ -48,9 +52,9 @@ function AppContent() {
     if (location.pathname !== prevPath) {
       setShowPageLoader(true);
       const timer = setTimeout(() => setShowPageLoader(false), 800);
-      
+
       setPrevPath(location.pathname);
-      return () => clearTimeout(timer); // ✅ Cleanup timer to prevent memory leaks
+      return () => clearTimeout(timer); // Prevent memory leaks
     }
   }, [location.pathname, prevPath, initialLoadComplete]);
 
@@ -251,6 +255,36 @@ function AppContent() {
                   transition={{ duration: 0.5 }}
                 >
                   <AiAssistant />
+                </motion.div>
+              }
+            />
+
+            {/* NEW ROUTES BELOW */}
+            <Route
+              path="/scratch-lesson"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <ScratchLesson />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/comparison-lesson"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <ComparisonLesson />
                 </motion.div>
               }
             />

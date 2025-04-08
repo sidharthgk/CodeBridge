@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, Code2, Save, Play } from 'lucide-react';
 import { useProjectStore } from '../../store/projectStore';
 import InteractiveCodeEditor from '../components/InteractiveCodeEditor';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toagst';
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
