@@ -1,59 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Github, ExternalLink, BookOpen, Clock, Star, Users } from 'lucide-react';
+import { Code2, Github, ExternalLink, BookOpen, Clock, Star, Users, ChevronRight } from 'lucide-react';
+import { useProjectStore } from '../../store/projectStore';
+import { Link } from 'react-router-dom';
 
 const ProjectCard = ({ 
-  title, 
-  description, 
-  difficulty, 
-  duration, 
-  technologies, 
-  image,
-  stars,
-  learners
+  project,
+  onClick
 }: { 
-  title: string;
-  description: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  duration: string;
-  technologies: string[];
-  image: string;
-  stars: number;
-  learners: number;
+  project: any;
+  onClick: () => void;
 }) => {
   const difficultyColor = {
     Beginner: 'text-green-500',
     Intermediate: 'text-yellow-500',
     Advanced: 'text-red-500'
-  }[difficulty];
+  }[project.difficulty];
 
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      className="glass-panel overflow-hidden group"
+      className="glass-panel overflow-hidden group cursor-pointer"
+      onClick={onClick}
     >
       <div className="relative h-48 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
         <img 
-          src={image} 
-          alt={title} 
+          src={project.image} 
+          alt={project.title} 
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute bottom-4 left-4 right-4 z-20">
-          <h3 className="text-xl font-bold mb-2">{title}</h3>
+          <h3 className="text-xl font-bold mb-2">{project.title}</h3>
           <div className="flex items-center space-x-4 text-sm">
-            <span className={`${difficultyColor}`}>{difficulty}</span>
+            <span className={`${difficultyColor}`}>{project.difficulty}</span>
             <div className="flex items-center space-x-1">
               <Clock className="h-4 w-4" />
-              <span>{duration}</span>
+              <span>{project.duration}</span>
             </div>
           </div>
         </div>
       </div>
       <div className="p-6">
-        <p className="text-gray-400 mb-4">{description}</p>
+        <p className="text-gray-400 mb-4">{project.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
-          {technologies.map((tech) => (
+          {project.technologies.map((tech: string) => (
             <span 
               key={tech}
               className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-sm"
@@ -62,74 +53,45 @@ const ProjectCard = ({
             </span>
           ))}
         </div>
-        <div className="flex items-center justify-between text-sm text-gray-400">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <Star className="h-4 w-4 text-amber-500" />
-              <span>{stars}</span>
+        {project.progress > 0 && (
+          <div className="mt-4">
+            <div className="relative h-2 bg-black/30 rounded-full overflow-hidden">
+              <div 
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full transition-all duration-300"
+                style={{ width: `${project.progress}%` }}
+              />
             </div>
-            <div className="flex items-center space-x-1">
-              <Users className="h-4 w-4 text-amber-500" />
-              <span>{learners} learners</span>
-            </div>
+            <p className="text-sm text-gray-400 mt-2">{project.progress}% Complete</p>
           </div>
-          <div className="flex space-x-2">
-            <button className="p-2 hover:bg-amber-500/10 rounded-lg transition-colors">
-              <Github className="h-4 w-4" />
-            </button>
-            <button className="p-2 hover:bg-amber-500/10 rounded-lg transition-colors">
-              <ExternalLink className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );
 };
 
 const ProjectLearning = () => {
-  const projects = [
-    {
-      title: 'Build a Modern Chat App',
-      description: 'Create a real-time chat application using React and Firebase with modern UI/UX principles.',
-      difficulty: 'Intermediate' as const,
-      duration: '4-6 hours',
-      technologies: ['React', 'Firebase', 'TailwindCSS'],
-      image: 'https://images.unsplash.com/photo-1611746872915-64382b5c76da?auto=format&fit=crop&q=80',
-      stars: 245,
-      learners: 1234
-    },
-    {
-      title: 'Weather Dashboard',
-      description: 'Build a beautiful weather dashboard with React, integrating with weather APIs and animations.',
-      difficulty: 'Beginner' as const,
-      duration: '2-3 hours',
-      technologies: ['React', 'APIs', 'ChartJS'],
-      image: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?auto=format&fit=crop&q=80',
-      stars: 189,
-      learners: 892
-    },
-    {
-      title: 'E-commerce Platform',
-      description: 'Create a full-featured e-commerce platform with shopping cart, payments, and admin dashboard.',
-      difficulty: 'Advanced' as const,
-      duration: '10-12 hours',
-      technologies: ['React', 'Node.js', 'Stripe', 'MongoDB'],
-      image: 'https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80',
-      stars: 432,
-      learners: 2156
-    },
-    {
-      title: 'Task Management App',
-      description: 'Build a Trello-like task management application with drag-and-drop functionality.',
-      difficulty: 'Intermediate' as const,
-      duration: '6-8 hours',
-      technologies: ['React', 'DnD', 'Redux'],
-      image: 'https://images.unsplash.com/photo-1540350394557-8d14678e7f91?auto=format&fit=crop&q=80',
-      stars: 156,
-      learners: 945
-    }
-  ];
+  const { projects, setActiveProject } = useProjectStore();
+  const [filter, setFilter] = useState({
+    difficulty: 'all',
+    technology: 'all',
+    sort: 'newest'
+  });
+
+  const handleProjectClick = (project: any) => {
+    setActiveProject(project);
+    window.location.href = `/project/${project.id}`;
+  };
+
+  const filteredProjects = projects
+    .filter(project => 
+      (filter.difficulty === 'all' || project.difficulty === filter.difficulty) &&
+      (filter.technology === 'all' || project.technologies.includes(filter.technology))
+    )
+    .sort((a, b) => {
+      if (filter.sort === 'newest') return -1;
+      if (filter.sort === 'popular') return b.progress - a.progress;
+      return 0;
+    });
 
   return (
     <div className="min-h-screen pt-20 px-4">
@@ -154,29 +116,44 @@ const ProjectLearning = () => {
 
           {/* Filters */}
           <div className="glass-panel p-4 flex flex-wrap gap-4">
-            <select className="input-field bg-black/50">
+            <select 
+              className="input-field bg-black/50"
+              value={filter.difficulty}
+              onChange={(e) => setFilter({ ...filter, difficulty: e.target.value })}
+            >
               <option value="all">All Difficulties</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
             </select>
-            <select className="input-field bg-black/50">
+            <select 
+              className="input-field bg-black/50"
+              value={filter.technology}
+              onChange={(e) => setFilter({ ...filter, technology: e.target.value })}
+            >
               <option value="all">All Technologies</option>
-              <option value="react">React</option>
-              <option value="node">Node.js</option>
-              <option value="python">Python</option>
+              <option value="React">React</option>
+              <option value="Firebase">Firebase</option>
+              <option value="TailwindCSS">TailwindCSS</option>
             </select>
-            <select className="input-field bg-black/50">
+            <select 
+              className="input-field bg-black/50"
+              value={filter.sort}
+              onChange={(e) => setFilter({ ...filter, sort: e.target.value })}
+            >
               <option value="newest">Newest First</option>
               <option value="popular">Most Popular</option>
-              <option value="starred">Most Starred</option>
             </select>
           </div>
 
           {/* Projects Grid */}
           <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <ProjectCard key={index} {...project} />
+            {filteredProjects.map((project) => (
+              <ProjectCard 
+                key={project.id} 
+                project={project}
+                onClick={() => handleProjectClick(project)}
+              />
             ))}
           </div>
 

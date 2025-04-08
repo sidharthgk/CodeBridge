@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import LoadingScreen from "./components/LoadingScreen";
-import Particles from "./components/Particles"; 
+import Particles from "./components/Particles"; // Import Particles
 
+// Lazy loading pages for better performance
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -12,14 +13,11 @@ const ModeSelection = lazy(() => import("./pages/ModeSelection"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const CodeConverter = lazy(() => import("./pages/CodeConverter"));
 const ProjectLearning = lazy(() => import("./pages/ProjectLearning"));
+const ProjectDetails = lazy(() => import("./pages/ProjectDetails"));
 const ScratchMode = lazy(() => import("./pages/ScratchMode"));
 const ComparisonMode = lazy(() => import("./pages/ComparisonMode"));
 const PlaygroundPage = lazy(() => import("./pages/PlaygroundPage"));
 const AiAssistant = lazy(() => import("./pages/AiAssistant"));
-const Docs = lazy(() => import("./pages/Docs"));
-const ScratchLesson = lazy(() => import("./pages/ScratchLesson"));
-const ComparisonModeLesson = lazy(() => import("./pages/ComparisonModeLesson"));
-
 
 function App() {
   return (
@@ -74,7 +72,7 @@ function AppContent() {
         <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-black to-black" />
         <Particles
           particleColors={["#ffffff", "#ffffff"]}
-          particleCount= {900} // Optimize for mobile
+          particleCount={window.innerWidth > 768 ? 700 : 300} // Optimize for mobile
           particleSpread={20}
           speed={0.1}
           particleBaseSize={100}
@@ -84,11 +82,9 @@ function AppContent() {
         />
       </div>
 
-
       <Suspense fallback={<LoadingScreen />}>
         <AnimatePresence mode="wait">
-          
-      <Navbar />
+          <Navbar />
           <Routes location={location} key={location.pathname}>
             <Route
               path="/"
@@ -119,34 +115,6 @@ function AppContent() {
               }
             />
             <Route
-              path="/scratch-lesson"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={{ duration: 0.5 }}
-                >
-                  <ScratchLesson />
-                </motion.div>
-              }
-            />
-                        <Route
-              path="/comparison-lesson"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={{ duration: 0.5 }}
-                >
-                  <ComparisonModeLesson />
-                </motion.div>
-              }
-            />
-            <Route
               path="/signup"
               element={
                 <motion.div
@@ -171,34 +139,6 @@ function AppContent() {
                   transition={{ duration: 0.5 }}
                 >
                   <ModeSelection />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Signup />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/docs"
-              element={
-                <motion.div
-                  initial="initial"
-                  animate="in"
-                  exit="out"
-                  variants={pageVariants}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Docs />
                 </motion.div>
               }
             />
@@ -241,6 +181,20 @@ function AppContent() {
                   transition={{ duration: 0.5 }}
                 >
                   <ProjectLearning />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/project/:projectId"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <ProjectDetails />
                 </motion.div>
               }
             />
