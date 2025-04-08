@@ -38,6 +38,7 @@ function AppContent() {
   const [showPageLoader, setShowPageLoader] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
+  // Simulate splash loading for 2 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -46,18 +47,19 @@ function AppContent() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Show transitional loader between page navigations
   useEffect(() => {
     if (!initialLoadComplete) return;
-
     if (location.pathname !== prevPath) {
       setShowPageLoader(true);
       const timer = setTimeout(() => setShowPageLoader(false), 800);
 
       setPrevPath(location.pathname);
-      return () => clearTimeout(timer); // Prevent memory leaks
+      return () => clearTimeout(timer);
     }
   }, [location.pathname, prevPath, initialLoadComplete]);
 
+  // If still in splash load
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -90,6 +92,7 @@ function AppContent() {
         <AnimatePresence mode="wait">
           <Navbar />
           <Routes location={location} key={location.pathname}>
+            {/* Existing Routes */}
             <Route
               path="/"
               element={
@@ -259,7 +262,7 @@ function AppContent() {
               }
             />
 
-            {/* NEW ROUTES BELOW */}
+            {/* NEW LESSON ROUTES */}
             <Route
               path="/scratch-lesson"
               element={

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { GitCompare, Play } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 
 const languages = [
   { id: 'python', name: 'Python', icon: '🐍' },
@@ -283,7 +283,7 @@ const ComparisonMode = () => {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-center mb-10"
             >
-              <Link href="/comparison-lesson">
+              <Link to="/comparison-lesson">
               <button className="btn-primary flex items-center space-x-2 group">
                 <Play className="h-5 w-5 group-hover:scale-110 transition-transform" />
                 <span>Start Comparison Learning</span>
